@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="极简时间轴日记">
+  <title>日记</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <!-- 顶部导航栏 -->
+  <header class="app-header">
+    <div class="header-container">
+      <h1 class="app-title">日记</h1>
+      <button class="btn-new" id="btnNew" aria-label="新建记录">+</button>
+    </div>
+  </header>
+
+  <!-- 时间锚点 -->
+  <div class="time-anchor" id="timeAnchor">
+    <div class="time-anchor-container">
+      <div class="time-anchor-year">2024</div>
+      <div class="time-anchor-primary">
+        <span class="time-anchor-month">12</span>
+        <span class="time-anchor-separator">/</span>
+        <span class="time-anchor-day">16</span>
+      </div>
+      <div class="time-anchor-weekday">Mon</div>
+    </div>
+  </div>
+
+  <!-- 主内容区域 -->
+  <main class="app-main">
+    <!-- 左侧生命日历 -->
+    <aside class="life-calendar" id="lifeCalendar">
+      <div class="life-calendar-header">
+        <span class="calendar-title">生命日历</span>
+      </div>
+
+      <!-- 星期头 -->
+      <div class="calendar-weekday-header">
+        <div class="week-number-cell"></div>
+        <div class="weekday-cell">SUN</div>
+        <div class="weekday-cell">MON</div>
+        <div class="weekday-cell">TUE</div>
+        <div class="weekday-cell">WED</div>
+        <div class="weekday-cell">THU</div>
+        <div class="weekday-cell">FRI</div>
+        <div class="weekday-cell">SAT</div>
+      </div>
+
+      <div class="life-calendar-grid" id="lifeCalendarGrid">
+        <!-- 日历矩阵将通过 JS 动态生成 -->
+      </div>
+    </aside>
+
+    <!-- 右侧时间轴 -->
+    <div class="timeline-wrapper">
+      <div class="timeline-container" id="timeline">
+        <!-- 时间轴内容将通过 JS 动态渲染到这里 -->
+
+        <!-- 空状态（初次使用时显示） -->
+        <div class="empty-state" id="emptyState">
+          <p class="empty-hint">开始记录</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 编辑器（弹出层） -->
+  <div class="editor-overlay" id="editorOverlay">
+    <div class="editor-container">
+      <div class="editor-header">
+        <button class="btn-close" id="btnClose" aria-label="关闭">×</button>
+        <span class="editor-time" id="editorTime">14:32</span>
+      </div>
+      <textarea
+        class="editor-textarea"
+        id="editorTextarea"
+        placeholder="写点什么..."
+        autofocus
+      ></textarea>
+      <div class="editor-footer">
+        <button class="btn-delete" id="btnDelete">删除</button>
+        <button class="btn-save" id="btnSave">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部浮动添加按钮 -->
+  <button class="btn-add-float" id="btnAddFloat" aria-label="新建日记">
+    <svg class="btn-add-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <!-- JavaScript -->
+  <script src="js/storage.js"></script>
+  <script src="js/models.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

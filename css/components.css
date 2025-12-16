@@ -1,0 +1,866 @@
+/* 新建按钮 */
+.btn-new {
+  width: 32px;
+  height: 32px;
+  font-size: 24px;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.btn-new:hover {
+  color: var(--color-text-primary);
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-3xl) 0;
+}
+
+.empty-hint {
+  font-size: var(--font-size-date);
+  color: var(--color-text-tertiary);
+}
+
+/* ========================================
+   年份分隔符（时间章节留白）
+   ======================================== */
+
+.year-divider {
+  position: relative;
+  height: 180px;  /* 超大留白，营造时间断层 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 80px 0;  /* 额外上下间距，强化章节感 */
+}
+
+.year-divider-number {
+  font-size: 80px;
+  font-weight: 100;  /* 极细字体，降低存在感 */
+  color: var(--color-text-primary);
+  opacity: 0.1;  /* 极淡，若隐若现的时间水印 */
+  letter-spacing: 8px;
+  user-select: none;
+  pointer-events: none;
+
+  /* 等宽数字，保持对齐 */
+  font-variant-numeric: tabular-nums;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* 微妙的浮现动画 */
+  animation: yearFadeIn 1200ms ease-out;
+}
+
+@keyframes yearFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 0.1;
+    transform: translateY(0);
+  }
+}
+
+/* 可选：hover 时微微浮现 */
+.year-divider:hover .year-divider-number {
+  opacity: 0.2;
+  transition: opacity 600ms ease;
+}
+
+/* 移动端优化 */
+@media (max-width: 767px) {
+  .year-divider {
+    height: 140px;
+    margin: 60px 0;
+  }
+
+  .year-divider-number {
+    font-size: 60px;
+    letter-spacing: 4px;
+  }
+}
+
+/* 日期分割线 */
+.date-divider {
+  margin: 56px 0 24px;  /* 优化：不对称间距（上 56px / 下 24px）*/
+  border-top: 1px dashed var(--color-divider);
+  padding-top: var(--spacing-lg);
+}
+
+/* 第一个日期分组：减少上方留白 */
+.date-group:first-child .date-divider {
+  margin-top: 0;
+}
+
+/* 日期头部（包含天气选择器）*/
+.date-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.date-label {
+  font-size: var(--font-size-date);
+  color: var(--color-text-tertiary);
+  font-weight: 400;
+  letter-spacing: 1px;  /* 新增：字间距拉宽，增强刻印感 */
+}
+
+/* ========================================
+   天气选择器
+   ======================================== */
+
+.weather-selector {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.25;  /* 默认极淡 */
+  transition: opacity var(--transition-normal),
+              transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.weather-selector:hover {
+  opacity: 0.5;  /* hover 时略微增强 */
+  transform: scale(1.1);
+}
+
+/* 有天气时稍微增强存在感 */
+.weather-selector[data-weather]:not([data-weather=""]) {
+  opacity: 0.35;
+}
+
+.weather-selector[data-weather]:not([data-weather=""]):hover {
+  opacity: 0.6;
+}
+
+/* 天气图标 */
+.weather-icon {
+  width: 100%;
+  height: 100%;
+  color: var(--color-text-tertiary);
+}
+
+/* 空状态：显示一个极淡的圆点（暗示可点击）*/
+.weather-selector[data-weather=""]::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
+  display: block;
+}
+
+.weather-selector[data-weather=""]:hover::before {
+  width: 6px;
+  height: 6px;
+}
+
+/* 确保按钮在移动端有足够的点击区域 */
+@media (max-width: 767px) {
+  .weather-selector {
+    width: 20px;
+    height: 20px;
+    margin-right: -4px;  /* 视觉上更紧凑 */
+  }
+}
+
+/* 单条记录 */
+.entry-item {
+  display: flex;
+  margin-bottom: var(--entry-spacing-medium);  /* 默认中等间距 */
+  cursor: pointer;
+  transition: background-color var(--transition-slow);  /* 优化：慢速浮现 */
+  padding: 8px 0;                    /* 新增：上下留白，扩大点击区域 */
+  margin-left: -8px;                 /* 抵消 padding，保持对齐 */
+  margin-right: -8px;
+  border-radius: 4px;                /* 新增：微妙的圆角 */
+}
+
+.entry-item:hover {
+  background-color: var(--hover-bg); /* 优化：极淡背景，而非 opacity */
+}
+
+/* 首条记录：额外上方间距 */
+.date-group .entry-item:first-of-type {
+  margin-top: 12px;
+}
+
+/* 末条记录：减少下方间距 */
+.date-group:last-child .entry-item:last-of-type {
+  margin-bottom: 16px;
+}
+
+.entry-time {
+  width: 48px;
+  flex-shrink: 0;
+  font-size: var(--font-size-time);
+  color: var(--color-text-secondary);
+  text-align: right;
+  padding-top: 2px;
+  opacity: var(--time-opacity-old);  /* 新增：默认半透明 */
+  transition: opacity var(--transition-slow);  /* 新增：浮现效果 */
+  position: relative;  /* 用于定位时间线 */
+}
+
+.entry-item:hover .entry-time {
+  opacity: var(--time-opacity-hover); /* 新增：hover 时浮现 */
+}
+
+.entry-content {
+  flex: 1;
+  margin-left: var(--spacing-sm);
+  font-size: var(--font-size-content);
+  line-height: var(--line-height-normal);  /* 优化：使用变量 */
+  color: var(--content-color-normal);      /* 优化：使用变量 */
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* 短句样式（通过 JS 动态添加 class）*/
+.entry-item--short .entry-content {
+  color: var(--content-color-short);
+  line-height: var(--line-height-short);
+}
+
+.entry-item--short {
+  margin-bottom: var(--entry-spacing-short);
+}
+
+/* 长文样式（通过 JS 动态添加 class）*/
+.entry-item--long {
+  margin-bottom: var(--entry-spacing-long);
+}
+
+/* 编辑器遮罩层 */
+.editor-overlay {
+  display: none; /* 默认隐藏 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-bg-overlay);
+  z-index: 200;
+  animation: fadeIn var(--transition-normal);
+}
+
+.editor-overlay.active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 编辑器容器 */
+.editor-container {
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;  /* 优化：80vh → 85vh */
+  background-color: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp var(--transition-normal);
+  overflow: hidden;  /* 确保内容不溢出 */
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.btn-close {
+  font-size: 28px;
+  color: var(--color-text-secondary);
+  line-height: 1;
+}
+
+.editor-time {
+  font-size: var(--font-size-time);
+  color: var(--color-text-secondary);
+}
+
+.editor-textarea {
+  /* 不使用 flex: 1，改为自适应高度 */
+  min-height: 80px;                 /* 最小高度（约 2-3 行）*/
+  max-height: 480px;                /* 最大高度（约 16 行）*/
+  padding: var(--spacing-md);
+  font-size: var(--font-size-content);
+  line-height: var(--line-height-content);
+  overflow-y: hidden;               /* 默认隐藏滚动条 */
+  transition: none;                 /* 不使用动画，保持安静 */
+  resize: none;                     /* 禁止手动拖拽调整大小 */
+}
+
+/* 编辑器 focus：克制的反馈 */
+.editor-textarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid var(--color-divider);
+}
+
+.btn-delete {
+  font-size: 14px;
+  color: var(--color-text-tertiary);
+}
+
+.btn-delete:hover {
+  color: #d32f2f;
+}
+
+.btn-save {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.btn-save:hover {
+  opacity: 0.7;
+}
+
+/* 平板端优化 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .timeline-container {
+    padding: 0 var(--container-padding-tablet);
+  }
+
+  .header-container {
+    padding: 0 var(--container-padding-tablet);
+  }
+}
+
+/* 移动端优化 */
+@media (max-width: 767px) {
+  .editor-container {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90vh;  /* 移动端增加到 90% */
+    border-radius: 0;
+  }
+
+  .editor-textarea {
+    max-height: calc(90vh - 120px); /* 减去 header 和 footer 高度 */
+  }
+
+  .entry-content {
+    font-size: 15px;
+  }
+
+  /* 移动端：增加点击热区 */
+  .entry-item {
+    padding: 12px 8px;
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+}
+
+/* ========================================
+   时间锚点（顶部日期展示）
+   ======================================== */
+.time-anchor {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  height: 64px;
+  background-color: rgba(250, 250, 250, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(232, 232, 232, 0.4);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity var(--transition-normal);
+}
+
+.time-anchor-container {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+/* 年份：极弱存在感 */
+.time-anchor-year {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.4;
+  letter-spacing: 0.5px;
+  transition: opacity 300ms ease;  /* 年份变化时的过渡 */
+}
+
+/* 年份变化时的微妙强调 */
+.time-anchor-year--highlight {
+  opacity: 1 !important;
+}
+
+/* 月 / 日：视觉核心 */
+.time-anchor-primary {
+  display: flex;
+  align-items: baseline;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--color-text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.time-anchor-month,
+.time-anchor-day {
+  font-variant-numeric: tabular-nums;
+}
+
+.time-anchor-separator {
+  font-size: 20px;
+  opacity: 0.3;
+  margin: 0 2px;
+}
+
+/* 星期：辅助信息 */
+.time-anchor-weekday {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 移动端优化 */
+@media (max-width: 767px) {
+  .time-anchor {
+    height: 56px;
+  }
+
+  .time-anchor-container {
+    gap: 8px;
+  }
+
+  .time-anchor-year {
+    font-size: 10px;
+  }
+
+  .time-anchor-primary {
+    font-size: 24px;
+  }
+
+  .time-anchor-separator {
+    font-size: 18px;
+  }
+
+  .time-anchor-weekday {
+    font-size: 10px;
+  }
+}
+
+/* ========================================
+   底部浮动添加按钮
+   ======================================== */
+.btn-add-float {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 150;
+
+  /* 尺寸 */
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+
+  /* 视觉 */
+  background-color: var(--color-text-primary);
+  color: var(--color-bg-primary);
+  border: none;
+  cursor: pointer;
+
+  /* 极轻微阴影（克制）*/
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
+              0 1px 2px rgba(0, 0, 0, 0.04);
+
+  /* 布局 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* 过渡 */
+  transition: transform var(--transition-normal),
+              box-shadow var(--transition-normal);
+}
+
+.btn-add-float:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12),
+              0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.btn-add-float:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+.btn-add-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* 移动端优化 */
+@media (max-width: 767px) {
+  .btn-add-float {
+    bottom: 24px;
+    bottom: max(24px, env(safe-area-inset-bottom));
+  }
+
+  /* 扩大点击区域 */
+  .btn-add-float::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+  }
+}
+
+/* 横屏模式优化 */
+@media (orientation: landscape) and (max-width: 767px) {
+  .btn-add-float {
+    bottom: 16px;
+  }
+}
+
+/* ========================================
+   生命日历（左侧）
+   ======================================== */
+
+.life-calendar {
+  width: 280px;  /* 从 240px 增加到 280px，容纳周数列 */
+  flex-shrink: 0;
+  position: sticky;
+  top: calc(var(--header-height) + 64px + var(--spacing-3xl));
+  align-self: flex-start;
+
+  padding: 0 var(--spacing-md);
+  max-height: calc(100vh - var(--header-height) - 64px - var(--spacing-3xl) - 40px);
+  overflow-y: auto;
+
+  /* 隐藏滚动条但保留滚动功能 */
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* IE/Edge */
+}
+
+.life-calendar::-webkit-scrollbar {
+  display: none;  /* Chrome/Safari */
+}
+
+/* 总标题 */
+.life-calendar-header {
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.calendar-title {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.3;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ========================================
+   年龄块
+   ======================================== */
+.age-section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.age-header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+/* 年龄（主信息）*/
+.age-primary {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  opacity: 0.8;
+  letter-spacing: 0.5px;
+}
+
+/* 年份（次级信息）*/
+.age-secondary {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.25;
+  letter-spacing: 0.5px;
+}
+
+.age-calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ========================================
+   星期头部
+   ======================================== */
+.calendar-weekday-header {
+  display: grid;
+  grid-template-columns: 28px repeat(7, 1fr);  /* 左侧周数占位 + 7天 */
+  gap: 2px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.week-number-cell {
+  width: 28px;  /* 与周数标签同宽 */
+}
+
+.weekday-cell {
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.3;
+  text-align: center;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* ========================================
+   日历网格（改为行式布局）
+   ======================================== */
+.life-calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: var(--spacing-xl);
+}
+
+/* ========================================
+   周行（每行 = 周数 + 7天）
+   ======================================== */
+.calendar-week-row {
+  display: grid;
+  grid-template-columns: 28px repeat(7, 1fr);  /* 左侧周数 + 7天 */
+  gap: 2px;
+  align-items: center;
+}
+
+/* 周数标签 */
+.week-number {
+  width: 28px;
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.2;
+  text-align: right;
+  padding-right: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   日期方块（保持原有样式）
+   ======================================== */
+.calendar-day {
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: rgba(0, 0, 0, 0.04);
+  border-radius: 2px;
+  transition: background-color var(--transition-normal),
+              transform var(--transition-fast),
+              opacity var(--transition-slow);
+  cursor: default;
+  position: relative;
+  opacity: 0.85;  /* 过去月份略微褪色 */
+}
+
+/* 空白方块（用于对齐星期或未来日期）*/
+.calendar-day--empty {
+  background-color: transparent;
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* 当前月的方块 */
+.calendar-day--current-month {
+  opacity: 1;
+}
+
+/* 有记录的日子 */
+.calendar-day--recorded {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* 今天 */
+.calendar-day--today {
+  background-color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-sizing: border-box;
+  opacity: 1 !important;  /* 今天始终全亮 */
+}
+
+/* 今天 + 有记录 */
+.calendar-day--today.calendar-day--recorded {
+  background-color: var(--color-text-primary);
+}
+
+/* Hover 效果：微微放大 */
+.calendar-day:hover:not(.calendar-day--empty) {
+  transform: scale(1.15);
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+/* 当前阅读的日期：轻微高亮（心理联动）*/
+.calendar-day--active {
+  background-color: rgba(0, 0, 0, 0.30);
+  transition: background-color 600ms ease;  /* 极慢过渡，营造呼吸感 */
+}
+
+.calendar-day--active.calendar-day--recorded {
+  background-color: rgba(0, 0, 0, 0.35);
+}
+
+.calendar-day--today.calendar-day--active {
+  background-color: var(--color-text-primary);
+}
+
+
+/* ========================================
+   年份分隔符（调整为全宽）
+   ======================================== */
+.calendar-year-divider {
+  height: 32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.calendar-year-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 32px;  /* 跳过周数列 */
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ========================================
+   月份第一天标记（隐性节奏）
+   ======================================== */
+.calendar-day--month-start::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 2px;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 0 1px 1px 0;
+}
+
+/* ========================================
+   响应式：平板端
+   ======================================== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .life-calendar {
+    width: 220px;
+  }
+
+  .calendar-weekday-header,
+  .calendar-week-row {
+    grid-template-columns: 24px repeat(7, 1fr);
+  }
+
+  .week-number-cell,
+  .week-number {
+    width: 24px;
+    font-size: 8px;
+    padding-right: 4px;
+  }
+
+  .weekday-cell {
+    font-size: 8px;
+  }
+}
+
+/* ========================================
+   响应式：移动端（隐藏左侧日历）
+   ======================================== */
+@media (max-width: 767px) {
+  .life-calendar {
+    display: none;
+  }
+}
+
+/* ========================================
+   空日期提示（时间穿梭后的轻量级反馈）
+   ======================================== */
+.empty-date-hint {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 250;
+
+  padding: 16px 24px;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  opacity: 1;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.empty-date-hint--fade-out {
+  opacity: 0;
+}

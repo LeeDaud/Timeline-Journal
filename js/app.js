@@ -762,6 +762,7 @@ const DiaryApp = (function() {
     }, 2000);
   }
 
+
   /**
    * 处理日历右键菜单（标记/取消特殊日期）
    * @param {Event} event - 右键点击事件
@@ -777,30 +778,69 @@ const DiaryApp = (function() {
     const dateKey = dayElement.dataset.date;
     if (!dateKey) return;
 
+    // 🆕 检查是否是生日（系统级，禁止修改）
+    const birthDate = DiaryStorage.getBirthDate();
+    if (birthDate && DiaryModels.isBirthday(dateKey, birthDate)) {
+      const age = DiaryModels.getAge(birthDate, new Date(dateKey));
+      alert(`这一天是您的生日（${age} 周岁）\n\n生日由系统自动标记，无法手动修改。`);
+      return;
+    }
+
     // 检查是否已标记
     const existingMilestone = DiaryStorage.getMilestone(dateKey);
 
     if (existingMilestone) {
-      // 已标记：询问是否取消
-      if (confirm(`取消标记「${existingMilestone.label}」？`)) {
+      // 已标记：显示类型和标签，询问是否取消
+      const typeLabel = existingMilestone.type === 'milestone' ? '纪念日' : '特殊日期';
+      const displayLabel = existingMilestone.label || '(无备注)';
+      if (confirm(`取消标记\n\n类型：${typeLabel}\n备注：${displayLabel}`)) {
         DiaryStorage.setMilestone(dateKey, null);
         // 刷新日历
         DiaryUI.renderLifeCalendar();
       }
     } else {
-      // 未标记：询问标签
-      const label = prompt(
-        '标记为特殊日期\n\n' +
-        '请输入备注（可选）：\n' +
-        '例如：毕业、入职、搬家等人生转折点'
+      // 未标记：先选择类型
+      const typeChoice = prompt(
+        '标记特殊日期\n\n' +
+        '请选择类型：\n' +
+        '1 = 纪念日（人生重要节点：毕业/入职/结婚/重大转折）\n' +
+        '2 = 普通标记（值得记录但非节点：旅行/搬家/见面）\n\n' +
+        '注：生日由系统自动标记，无需手动添加\n\n' +
+        '输入 1 或 2：'
       );
 
-      // 用户点击取消或输入空白，不标记
+      // 用户取消
+      if (typeChoice === null) return;
+
+      // 验证输入
+      const type = typeChoice.trim() === '1' ? 'milestone' :
+                   typeChoice.trim() === '2' ? 'special' : null;
+
+      if (!type) {
+        alert('输入无效，请输入 1 或 2');
+        return;
+      }
+
+      // 🆕 检查是否是生日日期
+      const birthDate = DiaryStorage.getBirthDate();
+      if (birthDate && DiaryModels.isBirthday(dateKey, birthDate)) {
+        alert('这一天是您的生日，由系统自动标记，无需手动添加。');
+        return;
+      }
+
+      // 询问备注
+      const typeLabel = type === 'milestone' ? '纪念日' : '普通标记';
+      const label = prompt(
+        `标记为：${typeLabel}\n\n` +
+        '请输入备注（可选）：'
+      );
+
+      // 用户取消
       if (label === null) return;
 
-      // 即使空字符串也标记（只显示圆点，无文字）
+      // 保存标记
       DiaryStorage.setMilestone(dateKey, {
-        type: 'milestone',
+        type: type,
         label: label.trim()
       });
 

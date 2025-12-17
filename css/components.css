@@ -84,6 +84,7 @@
 
 /* 日期分组容器 */
 .date-group {
+  position: relative;
   transition: background-color 400ms ease;
   margin-left: -8px;
   margin-right: -8px;
@@ -97,11 +98,87 @@
   background-color: rgba(0, 0, 0, 0.02);
 }
 
+/* 🆕 生日分组：最大留白（系统级）*/
+.date-group--birthday {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+/* 🆕 生日侧边标记（左侧粗竖线）*/
+.birthday-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-birthday) 0%,
+    rgba(47, 79, 108, 0.5) 50%,
+    var(--color-birthday) 100%
+  );
+  border-radius: 0 1.5px 1.5px 0;
+}
+
+/* 🆕 纪念日分组：增加上下留白 */
+.date-group--anniversary {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+/* 🆕 纪念日侧边标记（左侧细竖线）*/
+.anniversary-mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-anniversary) 0%,
+    rgba(139, 99, 56, 0.4) 50%,
+    var(--color-anniversary) 100%
+  );
+  border-radius: 0 1px 1px 0;
+}
+
 /* 日期分割线 */
 .date-divider {
   margin: 56px 0 24px;  /* 优化：不对称间距（上 56px / 下 24px）*/
   border-top: 1px dashed var(--color-divider);
   padding-top: var(--spacing-lg);
+}
+
+/* 生日的日期分割线：双线 + 靛青色 + 最大留白（系统级）*/
+.date-group--birthday .date-divider {
+  border-top: 2px solid var(--color-birthday);
+  margin: 80px 0 40px;  /* 最大的留白 */
+  padding-top: var(--spacing-2xl);
+  position: relative;
+}
+
+/* 生日分割线下方的微妙装饰线（靛青色）*/
+.date-group--birthday .date-divider::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(47, 79, 108, 0.15) 20%,
+    rgba(47, 79, 108, 0.15) 80%,
+    transparent 100%
+  );
+}
+
+/* 纪念日的日期分割线：实线 + 暖棕色 + 更明显 */
+.date-group--anniversary .date-divider {
+  border-top: 1.5px solid var(--color-anniversary);
+  margin: 64px 0 32px;  /* 更大的留白 */
+  padding-top: var(--spacing-xl);
 }
 
 /* 第一个日期分组：减少上方留白 */
@@ -122,6 +199,25 @@
   color: var(--color-text-tertiary);
   font-weight: 400;
   letter-spacing: 1px;  /* 新增：字间距拉宽，增强刻印感 */
+  transition: all var(--transition-normal);
+}
+
+/* 🆕 生日标签：最大 + 靛青色（系统级）*/
+.date-label--birthday {
+  font-size: 12px;  /* 最大 */
+  font-weight: 600;  /* 最粗 */
+  color: var(--color-birthday);
+  opacity: 1;
+  letter-spacing: 2px;  /* 最宽字间距 */
+}
+
+/* 🆕 纪念日标签：稍大 + 暖棕色 */
+.date-label--anniversary {
+  font-size: 11px;  /* 从 10px 增加到 11px */
+  font-weight: 500;
+  color: var(--color-anniversary);
+  opacity: 1;
+  letter-spacing: 1.5px;
 }
 
 /* ========================================
@@ -835,10 +931,75 @@
 }
 
 /* ========================================
-   特殊日期标记（里程碑）
+   特殊日期标记（三个层级 + 系统级生日）
    ======================================== */
-/* 极简小圆点：右上角标记 */
-.calendar-day--milestone::after {
+
+/* 系统级：生日（Birthday）- 时间原点，最高优先级 */
+.calendar-day--birthday {
+  /* 边框：靛青色（深蓝），2px */
+  border: 2px solid var(--color-birthday);
+  box-sizing: border-box;
+
+  /* 背景：淡靛青色点缀 */
+  background-color: var(--color-birthday-bg) !important;
+
+  /* 过渡 */
+  transition: all var(--transition-normal);
+}
+
+/* 生日 hover：边框加深，背景略深 */
+.calendar-day--birthday:hover {
+  border-color: rgba(47, 79, 108, 0.9);
+  background-color: rgba(47, 79, 108, 0.18) !important;
+  box-shadow: 0 0 0 1px rgba(47, 79, 108, 0.15);  /* 微妙外晕 */
+}
+
+/* 生日 + 有记录：背景加深 */
+.calendar-day--birthday.calendar-day--recorded {
+  background-color: rgba(47, 79, 108, 0.20) !important;
+}
+
+/* 生日 + 今天：特殊组合 */
+.calendar-day--birthday.calendar-day--today {
+  background-color: var(--color-text-primary) !important;
+  border-color: var(--color-birthday);
+  box-shadow: inset 0 0 0 1px rgba(47, 79, 108, 0.3);
+}
+
+/* 层级 1：纪念日（Anniversary）- 人生重要节点 */
+.calendar-day--anniversary {
+  /* 边框：暖棕色（琥珀），1.5px */
+  border: 1.5px solid var(--color-anniversary);
+  box-sizing: border-box;
+
+  /* 背景：淡暖棕色点缀 */
+  background-color: var(--color-anniversary-bg) !important;
+
+  /* 过渡 */
+  transition: all var(--transition-normal);
+}
+
+/* 纪念日 hover：边框加深，背景略深 */
+.calendar-day--anniversary:hover {
+  border-color: rgba(139, 99, 56, 0.85);
+  background-color: rgba(139, 99, 56, 0.14) !important;
+  box-shadow: 0 0 0 1px rgba(139, 99, 56, 0.12);  /* 微妙外晕 */
+}
+
+/* 纪念日 + 有记录：背景加深 */
+.calendar-day--anniversary.calendar-day--recorded {
+  background-color: rgba(139, 99, 56, 0.16) !important;
+}
+
+/* 纪念日 + 今天：特殊组合 */
+.calendar-day--anniversary.calendar-day--today {
+  background-color: var(--color-text-primary) !important;
+  border-color: var(--color-anniversary);
+  box-shadow: inset 0 0 0 1px rgba(139, 99, 56, 0.3);
+}
+
+/* 层级 2：普通特殊日期（Special）- 值得标记但非节点 */
+.calendar-day--special::after {
   content: '';
   position: absolute;
   top: 2px;
@@ -851,7 +1012,7 @@
 }
 
 /* hover 时圆点略微增大 */
-.calendar-day--milestone:hover::after {
+.calendar-day--special:hover::after {
   width: 3px;
   height: 3px;
   top: 1.5px;

@@ -248,6 +248,22 @@ const DiaryModels = (function() {
     return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
   }
 
+  /**
+   * 判断某个日期是否是生日（系统级判断）
+   * @param {string} dateKey - 日期键 (YYYY-MM-DD)
+   * @param {string} birthDate - 出生日期 (YYYY-MM-DD)
+   * @returns {boolean}
+   */
+  function isBirthday(dateKey, birthDate) {
+    if (!birthDate) return false;
+
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const [birthYear, birthMonth, birthDay] = birthDate.split('-').map(Number);
+
+    // 月-日匹配即为生日（忽略年份，生日每年重复）
+    return month === birthMonth && day === birthDay;
+  }
+
   // 公开接口
   return {
     generateId,
@@ -261,6 +277,7 @@ const DiaryModels = (function() {
     getAgeRange,
     getAgeYearLabel,
     formatDateKey,
-    getWeekNumber
+    getWeekNumber,
+    isBirthday  // 🆕 生日判断（系统级）
   };
 })();

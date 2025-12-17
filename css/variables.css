@@ -59,4 +59,10 @@
 
   /* 极淡背景 */
   --hover-bg: rgba(0, 0, 0, 0.02);
+
+  /* 特殊日期色彩（低饱和度，克制点缀）*/
+  --color-anniversary: rgba(139, 99, 56, 0.6);      /* 纪念日：暖棕色（琥珀）*/
+  --color-anniversary-bg: rgba(139, 99, 56, 0.08);  /* 纪念日背景 */
+  --color-birthday: rgba(47, 79, 108, 0.7);         /* 生日：靛青色（深蓝）*/
+  --color-birthday-bg: rgba(47, 79, 108, 0.12);     /* 生日背景 */
 }

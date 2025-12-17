@@ -72,11 +72,38 @@ const DiaryUI = (function() {
     // 🆕 获取该天的天气
     const weather = DiaryStorage.getDailyWeather(dateGroup.date);
 
+    // 🆕 检查是否是生日（系统级，优先级最高）
+    const birthDate = DiaryStorage.getBirthDate();
+    const isBirthday = birthDate && DiaryModels.isBirthday(dateGroup.date, birthDate);
+
+    // 🆕 检查是否是纪念日
+    const milestone = DiaryStorage.getMilestone(dateGroup.date);
+    const isAnniversary = !isBirthday && milestone && milestone.type === 'milestone';
+
+    // 确定样式类
+    let groupClass = 'date-group';
+    let labelClass = 'date-label';
+    let specialMark = '';
+
+    if (isBirthday) {
+      // 生日：最高优先级
+      groupClass = 'date-group date-group--birthday';
+      labelClass = 'date-label date-label--birthday';
+      const age = DiaryModels.getAge(birthDate, new Date(dateGroup.date));
+      specialMark = `<div class="birthday-mark" title="🎂 ${age} 周岁生日"></div>`;
+    } else if (isAnniversary) {
+      // 纪念日
+      groupClass = 'date-group date-group--anniversary';
+      labelClass = 'date-label date-label--anniversary';
+      specialMark = '<div class="anniversary-mark" title="纪念日"></div>';
+    }
+
     return `
-      <div class="date-group" data-date="${dateGroup.date}">
+      <div class="${groupClass}" data-date="${dateGroup.date}">
+        ${specialMark}
         <div class="date-divider">
           <div class="date-header">
-            <div class="date-label">${dateGroup.displayDate}</div>
+            <div class="${labelClass}">${dateGroup.displayDate}</div>
             <button class="weather-selector"
                     data-date="${dateGroup.date}"
                     data-weather="${weather}"
@@ -368,6 +395,9 @@ const DiaryUI = (function() {
         const isToday = date.getTime() === today.getTime();
         const isFuture = date > today;
 
+        // 🆕 判断是否是生日（系统级）
+        const isBirthdayDay = DiaryModels.isBirthday(dateKey, birthDate);
+
         week.days.push({
           date: date,
           dateKey: dateKey,
@@ -375,7 +405,8 @@ const DiaryUI = (function() {
           isFuture: isFuture,
           isEmpty: !isInRange,
           hasEntry: false,
-          age: isInRange ? age : null
+          age: isInRange ? age : null,
+          isBirthday: isBirthdayDay  // 🆕 系统级标记
         });
 
         currentDate.setDate(currentDate.getDate() + 1);
@@ -433,6 +464,7 @@ const DiaryUI = (function() {
           // 🆕 标记特殊日期（里程碑）
           const milestone = DiaryStorage.getMilestone(day.dateKey);
           day.isMilestone = !!milestone;
+          day.milestoneType = milestone?.type || null;  // 'milestone' 或 'special'
           day.milestoneLabel = milestone?.label || '';
         }
       });
@@ -482,6 +514,11 @@ const DiaryUI = (function() {
 
       let classes = ['calendar-day'];
 
+      // 🆕 生日优先级最高（系统级标记）
+      if (day.isBirthday) {
+        classes.push('calendar-day--birthday');
+      }
+
       if (day.hasEntry) {
         classes.push('calendar-day--recorded');
       }
@@ -499,9 +536,15 @@ const DiaryUI = (function() {
         classes.push('calendar-day--month-start');
       }
 
-      // 🆕 标记特殊日期
-      if (day.isMilestone) {
-        classes.push('calendar-day--milestone');
+      // 🆕 标记特殊日期（只在非生日时显示）
+      if (!day.isBirthday && day.isMilestone) {
+        if (day.milestoneType === 'milestone') {
+          // 纪念日：人生重要节点
+          classes.push('calendar-day--anniversary');
+        } else {
+          // 普通特殊日期：值得标记但非节点
+          classes.push('calendar-day--special');
+        }
       }
 
       // tooltip 显示完整日期（含年份和星期）
@@ -511,10 +554,19 @@ const DiaryUI = (function() {
         day: 'numeric'
       });
 
-      // 🆕 如果有特殊日期标记，追加标签
-      const tooltipText = day.milestoneLabel
-        ? `${dateStr}\n${day.milestoneLabel}`
-        : dateStr;
+      // 🆕 生日tooltip优先级最高
+      let tooltipText = dateStr;
+      if (day.isBirthday) {
+        // 计算当年年龄
+        const birthDate = DiaryStorage.getBirthDate();
+        if (birthDate) {
+          const age = DiaryModels.getAge(birthDate, day.date);
+          tooltipText = `${dateStr}\n🎂 ${age} 周岁生日`;
+        }
+      } else if (day.milestoneLabel) {
+        // 其他特殊日期标记
+        tooltipText = `${dateStr}\n${day.milestoneLabel}`;
+      }
 
       return `<div class="${classes.join(' ')}"
                    data-date="${day.dateKey}"

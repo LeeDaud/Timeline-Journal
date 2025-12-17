@@ -114,7 +114,11 @@ const DiaryApp = (function() {
     if (yearEl) yearEl.textContent = year;
     if (monthEl) monthEl.textContent = month;
     if (dayEl) dayEl.textContent = day;
-    if (weekdayEl) weekdayEl.textContent = weekday;
+    if (weekdayEl) {
+      // 🆕 添加相对时间感（距今天）
+      const relativeTime = getRelativeTimeText(dateKey);
+      weekdayEl.textContent = relativeTime || weekday;
+    }
 
     // 🆕 年份变化时的微妙强调
     if (yearChanged && yearEl) {
@@ -123,6 +127,31 @@ const DiaryApp = (function() {
         yearEl.classList.remove('time-anchor-year--highlight');
       }, 1500);
     }
+  }
+
+  /**
+   * 获取相对时间文本（距今天的天数）
+   * @param {string} dateKey - 日期键 (YYYY-MM-DD)
+   * @returns {string} 相对时间文本
+   */
+  function getRelativeTimeText(dateKey) {
+    const targetDate = new Date(dateKey);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    targetDate.setHours(0, 0, 0, 0);
+
+    const diffTime = today - targetDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'TODAY';
+    if (diffDays === 1) return 'YESTERDAY';
+    if (diffDays === -1) return 'TOMORROW';
+    if (diffDays > 1 && diffDays <= 7) return `${diffDays}D AGO`;
+    if (diffDays < -1 && diffDays >= -7) return `IN ${-diffDays}D`;
+
+    // 超过7天，显示星期
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return weekdays[targetDate.getDay()];
   }
 
   /**
@@ -157,12 +186,18 @@ const DiaryApp = (function() {
     const timeline = document.getElementById('timeline');
     if (timeline) {
       timeline.addEventListener('click', handleTimelineClick);
+      // 🆕 鼠标悬停联动（右侧 → 左侧）
+      timeline.addEventListener('mouseover', handleTimelineHover);
     }
 
     // 🆕 生命日历点击（事件委托）
     const lifeCalendar = document.getElementById('lifeCalendarGrid');
     if (lifeCalendar) {
       lifeCalendar.addEventListener('click', handleCalendarClick);
+      // 🆕 右键菜单（标记特殊日期）
+      lifeCalendar.addEventListener('contextmenu', handleCalendarContextMenu);
+      // 🆕 鼠标悬停联动（左侧 → 右侧）
+      lifeCalendar.addEventListener('mouseover', handleCalendarHover);
     }
 
     // 编辑器按钮
@@ -189,6 +224,28 @@ const DiaryApp = (function() {
    */
   function handleNew() {
     DiaryUI.openEditor(null);
+  }
+
+  /**
+   * 处理时间轴鼠标悬停（联动到左侧日历）
+   * @param {Event} event - 鼠标悬停事件
+   */
+  function handleTimelineHover(event) {
+    // 查找最近的日期分组
+    const dateGroup = event.target.closest('.date-group');
+    if (!dateGroup) return;
+
+    const dateKey = dateGroup.dataset.date;
+    if (!dateKey) return;
+
+    // 防止频繁触发：使用防抖
+    clearTimeout(window.timelineHoverTimeout);
+    window.timelineHoverTimeout = setTimeout(() => {
+      // 高亮左侧日历
+      updateCalendarHighlight(dateKey);
+      // 更新时间锚点
+      updateTimeAnchorFromDate(dateKey);
+    }, 50);  // 50ms 防抖延迟
   }
 
   /**
@@ -439,6 +496,40 @@ const DiaryApp = (function() {
     const targetDay = document.querySelector(`.calendar-day[data-date="${dateKey}"]`);
     if (targetDay) {
       targetDay.classList.add('calendar-day--active');
+
+      // 🆕 如果高亮日期不在可视区域，轻柔滚动到那里
+      scrollCalendarToDate(targetDay);
+    }
+  }
+
+  /**
+   * 将左侧日历滚动到指定日期（如果不在可视区域）
+   * @param {HTMLElement} targetDay - 目标日期元素
+   */
+  function scrollCalendarToDate(targetDay) {
+    const calendar = document.querySelector('.life-calendar');
+    if (!calendar) return;
+
+    const calendarRect = calendar.getBoundingClientRect();
+    const targetRect = targetDay.getBoundingClientRect();
+
+    // 检查是否在可视区域内
+    const isVisible =
+      targetRect.top >= calendarRect.top &&
+      targetRect.bottom <= calendarRect.bottom;
+
+    if (!isVisible) {
+      // 计算目标位置（居中显示）
+      const targetOffsetTop = targetDay.offsetTop;
+      const calendarHeight = calendar.clientHeight;
+      const targetHeight = targetDay.clientHeight;
+      const scrollTo = targetOffsetTop - (calendarHeight / 2) + (targetHeight / 2);
+
+      // 平滑滚动
+      calendar.scrollTo({
+        top: scrollTo,
+        behavior: 'smooth'
+      });
     }
   }
 
@@ -500,6 +591,78 @@ const DiaryApp = (function() {
     if (distance < 1000) return 800;
     if (distance < 3000) return 1200;
     return 1500;
+  }
+
+  /**
+   * 处理日历鼠标悬停（联动到右侧时间轴）
+   * @param {Event} event - 鼠标悬停事件
+   */
+  function handleCalendarHover(event) {
+    const dayElement = event.target.closest('.calendar-day');
+    if (!dayElement || dayElement.classList.contains('calendar-day--empty')) {
+      return;
+    }
+
+    const dateKey = dayElement.dataset.date;
+    if (!dateKey) return;
+
+    // 防止频繁触发：使用防抖
+    clearTimeout(window.calendarHoverTimeout);
+    window.calendarHoverTimeout = setTimeout(() => {
+      // 高亮右侧时间轴对应日期
+      highlightTimelineDate(dateKey);
+      // 更新时间锚点
+      updateTimeAnchorFromDate(dateKey);
+    }, 50);  // 50ms 防抖延迟
+  }
+
+  /**
+   * 高亮右侧时间轴中的日期组
+   * @param {string} dateKey - 日期键 (YYYY-MM-DD)
+   */
+  function highlightTimelineDate(dateKey) {
+    // 移除之前的高亮
+    const previousActive = document.querySelector('.date-group--active');
+    if (previousActive) {
+      previousActive.classList.remove('date-group--active');
+    }
+
+    // 查找对应的日期分组
+    const targetDateGroup = document.querySelector(`.date-group[data-date="${dateKey}"]`);
+    if (targetDateGroup) {
+      // 添加高亮
+      targetDateGroup.classList.add('date-group--active');
+
+      // 平滑滚动到该日期（如果不在视野中）
+      scrollTimelineToDate(targetDateGroup);
+    }
+  }
+
+  /**
+   * 将右侧时间轴滚动到指定日期（如果不在视野中）
+   * @param {HTMLElement} targetDateGroup - 目标日期分组元素
+   */
+  function scrollTimelineToDate(targetDateGroup) {
+    const rect = targetDateGroup.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const headerHeight = 48;
+    const timeAnchorHeight = 64;
+    const visibleTop = headerHeight + timeAnchorHeight;
+    const visibleBottom = windowHeight;
+
+    // 检查是否在可视区域内
+    const isVisible = rect.top >= visibleTop && rect.bottom <= visibleBottom;
+
+    if (!isVisible) {
+      // 计算目标位置（居中显示）
+      const currentScroll = window.pageYOffset;
+      const targetY = currentScroll + rect.top - visibleTop - 100;
+
+      window.scrollTo({
+        top: targetY,
+        behavior: 'smooth'
+      });
+    }
   }
 
   /**
@@ -597,6 +760,53 @@ const DiaryApp = (function() {
       hint.classList.add('empty-date-hint--fade-out');
       setTimeout(() => hint.remove(), 300);
     }, 2000);
+  }
+
+  /**
+   * 处理日历右键菜单（标记/取消特殊日期）
+   * @param {Event} event - 右键点击事件
+   */
+  function handleCalendarContextMenu(event) {
+    event.preventDefault();  // 阻止默认右键菜单
+
+    const dayElement = event.target.closest('.calendar-day');
+    if (!dayElement || dayElement.classList.contains('calendar-day--empty')) {
+      return;  // 空白方块不响应
+    }
+
+    const dateKey = dayElement.dataset.date;
+    if (!dateKey) return;
+
+    // 检查是否已标记
+    const existingMilestone = DiaryStorage.getMilestone(dateKey);
+
+    if (existingMilestone) {
+      // 已标记：询问是否取消
+      if (confirm(`取消标记「${existingMilestone.label}」？`)) {
+        DiaryStorage.setMilestone(dateKey, null);
+        // 刷新日历
+        DiaryUI.renderLifeCalendar();
+      }
+    } else {
+      // 未标记：询问标签
+      const label = prompt(
+        '标记为特殊日期\n\n' +
+        '请输入备注（可选）：\n' +
+        '例如：毕业、入职、搬家等人生转折点'
+      );
+
+      // 用户点击取消或输入空白，不标记
+      if (label === null) return;
+
+      // 即使空字符串也标记（只显示圆点，无文字）
+      DiaryStorage.setMilestone(dateKey, {
+        type: 'milestone',
+        label: label.trim()
+      });
+
+      // 刷新日历
+      DiaryUI.renderLifeCalendar();
+    }
   }
 
   /**

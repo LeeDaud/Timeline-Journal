@@ -82,6 +82,21 @@
   }
 }
 
+/* 日期分组容器 */
+.date-group {
+  transition: background-color 400ms ease;
+  margin-left: -8px;
+  margin-right: -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 4px;
+}
+
+/* 🆕 日期分组高亮（鼠标悬停联动）*/
+.date-group--active {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
 /* 日期分割线 */
 .date-divider {
   margin: 56px 0 24px;  /* 优化：不对称间距（上 56px / 下 24px）*/
@@ -755,6 +770,7 @@
 .calendar-day--active {
   background-color: rgba(0, 0, 0, 0.30);
   transition: background-color 600ms ease;  /* 极慢过渡，营造呼吸感 */
+  position: relative;
 }
 
 .calendar-day--active.calendar-day--recorded {
@@ -763,6 +779,23 @@
 
 .calendar-day--today.calendar-day--active {
   background-color: var(--color-text-primary);
+}
+
+/* 🆕 联动时的微妙脉动（仅在激活瞬间）*/
+@keyframes calendarPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+  }
+}
+
+.calendar-day--active {
+  animation: calendarPulse 800ms ease-out;
 }
 
 
@@ -799,6 +832,31 @@
   width: 2px;
   background-color: rgba(0, 0, 0, 0.15);
   border-radius: 0 1px 1px 0;
+}
+
+/* ========================================
+   特殊日期标记（里程碑）
+   ======================================== */
+/* 极简小圆点：右上角标记 */
+.calendar-day--milestone::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 2px;
+  height: 2px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+}
+
+/* hover 时圆点略微增大 */
+.calendar-day--milestone:hover::after {
+  width: 3px;
+  height: 3px;
+  top: 1.5px;
+  right: 1.5px;
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 /* ========================================

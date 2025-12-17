@@ -429,6 +429,11 @@ const DiaryUI = (function() {
           const year = day.date.getFullYear();
           const month = day.date.getMonth();
           day.isCurrentMonth = (year === currentYear && month === currentMonth);
+
+          // 🆕 标记特殊日期（里程碑）
+          const milestone = DiaryStorage.getMilestone(day.dateKey);
+          day.isMilestone = !!milestone;
+          day.milestoneLabel = milestone?.label || '';
         }
       });
     });
@@ -494,6 +499,11 @@ const DiaryUI = (function() {
         classes.push('calendar-day--month-start');
       }
 
+      // 🆕 标记特殊日期
+      if (day.isMilestone) {
+        classes.push('calendar-day--milestone');
+      }
+
       // tooltip 显示完整日期（含年份和星期）
       const dateStr = day.date.toLocaleDateString('zh-CN', {
         year: 'numeric',
@@ -501,9 +511,14 @@ const DiaryUI = (function() {
         day: 'numeric'
       });
 
+      // 🆕 如果有特殊日期标记，追加标签
+      const tooltipText = day.milestoneLabel
+        ? `${dateStr}\n${day.milestoneLabel}`
+        : dateStr;
+
       return `<div class="${classes.join(' ')}"
                    data-date="${day.dateKey}"
-                   title="${dateStr}"></div>`;
+                   title="${tooltipText}"></div>`;
     }).join('');
 
     return `

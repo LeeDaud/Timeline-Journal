@@ -7,42 +7,53 @@
   --color-bg-primary: #fafafa;        /* 主背景 */
   --color-bg-overlay: rgba(0, 0, 0, 0.4); /* 遮罩层 */
 
-  /* 字号 */
-  --font-size-content: 17px;          /* 内容文字（优化：16px → 17px）*/
-  --font-size-time: 11px;             /* 时间戳 */
-  --font-size-date: 10px;             /* 日期标签 */
+  /* 字号 - 重新平衡叙事权重 */
+  --font-size-content: 16px;          /* 内容文字（降低一档，不再是视觉中心）*/
+  --font-size-time: 12px;             /* 时间戳（增强，成为时间叙事的锚点）*/
+  --font-size-date: 11px;             /* 日期标签（增强，从注释升级为章节标题）*/
+  --font-size-date-number: 22px;      /* 日期数字（新增：月/日的主视觉）*/
 
   /* 行高 */
   --line-height-content: 1.7;         /* 内容行高（优化：1.8 → 1.7）*/
   --line-height-compact: 1.4;         /* 紧凑行高 */
 
-  /* 间距 */
+  /* 间距 - 重新定义节奏韵律 */
   --spacing-xs: 8px;
-  --spacing-sm: 12px;                 /* 优化：16px → 12px */
-  --spacing-md: 20px;                 /* 优化：24px → 20px */
-  --spacing-lg: 24px;                 /* 优化：32px → 24px */
-  --spacing-xl: 40px;                 /* 优化：48px → 40px */
-  --spacing-2xl: 48px;                /* 优化：60px → 48px */
-  --spacing-3xl: 56px;                /* 优化：80px → 56px */
+  --spacing-sm: 12px;
+  --spacing-md: 20px;
+  --spacing-lg: 28px;                 /* 增加基础间距 */
+  --spacing-xl: 48px;                 /* 日常节奏停顿 */
+  --spacing-2xl: 64px;                /* 重要节奏停顿 */
+  --spacing-3xl: 80px;                /* 纪念日级别留白 */
+  --spacing-4xl: 120px;               /* 生日级别留白（新增）*/
+  --spacing-5xl: 160px;               /* 年份级别留白（新增）*/
 
-  /* 布局 */
-  --container-max-width: 760px;       /* 内容区最大宽度（优化：680px → 760px）*/
-  --container-padding-desktop: 64px;  /* 桌面端左右内边距（优化：80px → 64px）*/
-  --container-padding-tablet: 40px;   /* 平板端左右内边距（新增）*/
-  --container-padding-mobile: 20px;   /* 移动端左右内边距（优化：24px → 20px）*/
+  /* 布局 - 优化阅读体验 */
+  --container-max-width: 680px;       /* 内容区最大宽度（收窄，更接近书页）*/
+  --container-padding-desktop: 80px;  /* 桌面端左右内边距（增加呼吸感）*/
+  --container-padding-tablet: 48px;   /* 平板端左右内边距 */
+  --container-padding-mobile: 24px;   /* 移动端左右内边距 */
   --header-height: 48px;              /* 顶部导航高度 */
+
+  /* 时间线系统（新增）*/
+  --timeline-offset: 68px;            /* 时间戳到时间线的距离 */
+  --timeline-width: 1px;              /* 时间线粗细 */
+  --timeline-color: rgba(0, 0, 0, 0.08); /* 时间线颜色：极淡 */
 
   /* 动画 */
   --transition-fast: 150ms ease;
   --transition-normal: 300ms ease;
   --transition-slow: 400ms ease-out;      /* 慢速浮现（新增）*/
 
-  /* 微妙层级与节奏（新增）*/
-  /* 时间戳透明度 */
-  --time-opacity-today: 0.75;
-  --time-opacity-recent: 0.6;
-  --time-opacity-old: 0.5;
-  --time-opacity-hover: 0.9;
+  /* 时间叙事的透明度层级 */
+  --time-opacity-today: 0.85;         /* 今天：更强存在感 */
+  --time-opacity-recent: 0.70;        /* 近期：清晰可见 */
+  --time-opacity-old: 0.55;           /* 过往：轻度褪色 */
+  --time-opacity-hover: 1.0;          /* 悬停：完全显现 */
+
+  /* 日期标签透明度 */
+  --date-opacity-default: 0.65;       /* 默认日期：比之前更强 */
+  --date-opacity-hover: 0.85;
 
   /* 内容颜色（基于长度）*/
   --content-color-short: #333333;         /* 短句：稍淡 */

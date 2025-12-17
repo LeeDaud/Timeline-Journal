@@ -46,16 +46,16 @@
 }
 
 /* ========================================
-   年份分隔符（时间章节留白）
+   年份分隔符（时间章节留白）- 最强的节奏停顿
    ======================================== */
 
 .year-divider {
   position: relative;
-  height: 180px;  /* 超大留白，营造时间断层 */
+  height: 200px;  /* 更大留白，营造时间断层 */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 80px 0;  /* 额外上下间距，强化章节感 */
+  margin: var(--spacing-5xl) 0;  /* 160px - 与生日同级的停顿 */
 }
 
 .year-divider-number {
@@ -165,18 +165,18 @@
   border-radius: 0 1px 1px 0;
 }
 
-/* 日期分割线 */
+/* 日期分割线 - 普通日子的节奏 */
 .date-divider {
-  margin: 56px 0 24px;  /* 优化：不对称间距（上 56px / 下 24px）*/
+  margin: var(--spacing-2xl) 0 var(--spacing-lg);  /* 64px / 28px */
   border-top: 1px dashed var(--color-divider);
   padding-top: var(--spacing-lg);
 }
 
-/* 生日的日期分割线：双线 + 靛青色 + 最大留白（系统级）*/
+/* 生日的日期分割线：最大留白 + 双线（系统级）*/
 .date-group--birthday .date-divider {
   border-top: 2px solid var(--color-birthday);
-  margin: 80px 0 40px;  /* 最大的留白 */
-  padding-top: var(--spacing-2xl);
+  margin: var(--spacing-5xl) 0 var(--spacing-3xl);  /* 160px / 80px - 最郑重的停顿 */
+  padding-top: var(--spacing-3xl);
   position: relative;
 }
 
@@ -197,11 +197,11 @@
   );
 }
 
-/* 纪念日的日期分割线：实线 + 暖棕色 + 更明显 */
+/* 纪念日的日期分割线：实线 + 暖棕色 + 明显留白 */
 .date-group--anniversary .date-divider {
   border-top: 1.5px solid var(--color-anniversary);
-  margin: 64px 0 32px;  /* 更大的留白 */
-  padding-top: var(--spacing-xl);
+  margin: var(--spacing-4xl) 0 var(--spacing-2xl);  /* 120px / 64px - 重要的停顿 */
+  padding-top: var(--spacing-2xl);
 }
 
 /* 第一个日期分组：减少上方留白 */
@@ -209,20 +209,62 @@
   margin-top: 0;
 }
 
-/* 日期头部（包含天气选择器）*/
+/* 日期头部 - 重新设计为"章节标题"而非"标签" */
 .date-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: var(--spacing-sm);
+  align-items: baseline;  /* 改为 baseline 对齐 */
+  gap: 12px;
+  margin-bottom: var(--spacing-lg);  /* 增加底部间距 */
+  padding-left: 0;  /* 与时间轴对齐 */
 }
 
+/* 日期容器 */
 .date-label {
-  font-size: var(--font-size-date);
-  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
   font-weight: 400;
-  letter-spacing: 1px;  /* 新增：字间距拉宽，增强刻印感 */
+  color: var(--color-text-secondary);
+  opacity: var(--date-opacity-default);
   transition: all var(--transition-normal);
+  line-height: 1;
+}
+
+.date-label:hover {
+  opacity: var(--date-opacity-hover);
+}
+
+/* 年份 - 前缀，极弱 */
+.date-year {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.4;
+  letter-spacing: 0.5px;
+}
+
+/* 月/日 - 主视觉 */
+.date-month-day {
+  font-size: var(--font-size-date-number);  /* 22px */
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+/* 斜杠分隔符 */
+.date-separator {
+  font-size: 16px;
+  opacity: 0.3;
+  margin: 0 -2px;
+}
+
+/* 星期 - 辅助信息 */
+.date-weekday {
+  font-size: 10px;
+  font-weight: 400;
+  opacity: 0.4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 4px;
 }
 
 /* 🆕 生日标签：最大 + 靛青色（系统级）*/
@@ -308,20 +350,55 @@
   }
 }
 
-/* 单条记录 */
+/* 单条记录 - 强化时间线叙事 */
 .entry-item {
   display: flex;
   margin-bottom: var(--entry-spacing-medium);  /* 默认中等间距 */
   cursor: pointer;
-  transition: background-color var(--transition-slow);  /* 优化：慢速浮现 */
-  padding: 8px 0;                    /* 新增：上下留白，扩大点击区域 */
-  margin-left: -8px;                 /* 抵消 padding，保持对齐 */
-  margin-right: -8px;
-  border-radius: 4px;                /* 新增：微妙的圆角 */
+  transition: background-color var(--transition-slow);
+  padding: 10px 0;                   /* 增加上下留白 */
+  margin-left: -12px;                /* 扩大点击区域 */
+  margin-right: -12px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 6px;                /* 略微增加圆角 */
+  position: relative;
 }
 
 .entry-item:hover {
-  background-color: var(--hover-bg); /* 优化：极淡背景，而非 opacity */
+  background-color: var(--hover-bg);
+}
+
+/* 垂直时间线 - 贯穿整个记录 */
+.entry-item::before {
+  content: '';
+  position: absolute;
+  left: var(--timeline-offset);      /* 68px，在时间戳右侧 */
+  top: 0;
+  bottom: 0;
+  width: var(--timeline-width);      /* 1px */
+  background: var(--timeline-color);  /* 极淡灰线 */
+  pointer-events: none;
+}
+
+/* 时间节点圆点 */
+.entry-item::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--timeline-offset) - 2px);  /* 居中对齐时间线 */
+  top: 20px;                         /* 对齐时间戳位置 */
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-text-secondary);
+  opacity: 0.25;
+  transition: all var(--transition-normal);
+  pointer-events: none;
+}
+
+.entry-item:hover::after {
+  opacity: 0.5;
+  transform: scale(1.2);
 }
 
 /* 首条记录：额外上方间距 */
@@ -334,30 +411,37 @@
   margin-bottom: 16px;
 }
 
+/* 时间戳 - 增强存在感 */
 .entry-time {
-  width: 48px;
+  width: 56px;                       /* 从 48px 增加到 56px */
   flex-shrink: 0;
-  font-size: var(--font-size-time);
+  font-size: var(--font-size-time);  /* 12px，已在变量中增强 */
+  font-weight: 500;                  /* 增加字重 */
   color: var(--color-text-secondary);
   text-align: right;
-  padding-top: 2px;
-  opacity: var(--time-opacity-old);  /* 新增：默认半透明 */
-  transition: opacity var(--transition-slow);  /* 新增：浮现效果 */
-  position: relative;  /* 用于定位时间线 */
+  padding-top: 3px;                  /* 微调对齐 */
+  opacity: var(--time-opacity-old);
+  transition: opacity var(--transition-slow);
+  position: relative;
+  letter-spacing: 0.3px;             /* 增加字间距 */
+  font-variant-numeric: tabular-nums; /* 等宽数字 */
 }
 
 .entry-item:hover .entry-time {
-  opacity: var(--time-opacity-hover); /* 新增：hover 时浮现 */
+  opacity: var(--time-opacity-hover);
 }
 
+/* 正文内容 - 降低视觉权重，让时间成为主叙事 */
 .entry-content {
   flex: 1;
-  margin-left: var(--spacing-sm);
-  font-size: var(--font-size-content);
-  line-height: var(--line-height-normal);  /* 优化：使用变量 */
-  color: var(--content-color-normal);      /* 优化：使用变量 */
+  margin-left: 24px;                 /* 增加与时间戳的间距 */
+  padding-left: 32px;                /* 为时间线留出空间 */
+  font-size: var(--font-size-content);  /* 16px，已降低 */
+  line-height: var(--line-height-normal);
+  color: var(--content-color-normal);
   white-space: pre-wrap;
   word-wrap: break-word;
+  position: relative;
 }
 
 /* 短句样式（通过 JS 动态添加 class）*/
@@ -622,53 +706,68 @@
 }
 
 /* ========================================
-   底部浮动添加按钮
+   底部浮动添加按钮 - 隐藏（改为时间轴末尾自然延续）
    ======================================== */
 .btn-add-float {
-  position: fixed;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 150;
+  display: none;  /* 隐藏悬浮按钮 */
+}
 
-  /* 尺寸 */
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
+/* ========================================
+   时间轴末尾"继续书写"区域 - 融入叙事的自然入口
+   ======================================== */
 
-  /* 视觉 */
-  background-color: var(--color-text-primary);
-  color: var(--color-bg-primary);
-  border: none;
+.timeline-continue-writing {
+  margin-top: var(--spacing-3xl);    /* 80px 留白 */
+  padding: var(--spacing-2xl) 0;     /* 64px 上下内边距 */
+  text-align: center;
+  position: relative;
   cursor: pointer;
-
-  /* 极轻微阴影（克制）*/
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
-              0 1px 2px rgba(0, 0, 0, 0.04);
-
-  /* 布局 */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  /* 过渡 */
-  transition: transform var(--transition-normal),
-              box-shadow var(--transition-normal);
+  transition: all var(--transition-slow);
 }
 
-.btn-add-float:hover {
-  transform: translateX(-50%) scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12),
-              0 2px 4px rgba(0, 0, 0, 0.06);
+/* 时间线延续（虚线向下延伸）*/
+.timeline-continue-writing::before {
+  content: '';
+  position: absolute;
+  left: var(--timeline-offset);      /* 68px，与记录的时间线对齐 */
+  top: 0;
+  height: 60px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    var(--timeline-color) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
-.btn-add-float:active {
-  transform: translateX(-50%) scale(0.95);
+/* "继续书写"文字 */
+.continue-writing-text {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.25;
+  letter-spacing: 1px;
+  transition: opacity var(--transition-slow);
 }
 
-.btn-add-icon {
-  width: 24px;
-  height: 24px;
+.timeline-continue-writing:hover .continue-writing-text {
+  opacity: 0.55;
+}
+
+/* 克制的 + 号标记 */
+.continue-writing-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-bottom: 12px;
+  opacity: 0.2;
+  transition: all var(--transition-normal);
+}
+
+.timeline-continue-writing:hover .continue-writing-icon {
+  opacity: 0.4;
+  transform: scale(1.1);
 }
 
 /* 移动端优化 */
@@ -697,17 +796,17 @@
 }
 
 /* ========================================
-   生命日历（左侧）
+   生命日历（左侧）- 强化"人生刻度尺"隐喻
    ======================================== */
 
 .life-calendar {
-  width: 280px;  /* 从 240px 增加到 280px，容纳周数列 */
+  width: 300px;  /* 增加宽度，强化存在感 */
   flex-shrink: 0;
   position: sticky;
   top: calc(var(--header-height) + 64px + var(--spacing-3xl));
   align-self: flex-start;
 
-  padding: 0 var(--spacing-md);
+  padding: 0 var(--spacing-lg);  /* 增加内边距 */
   max-height: calc(100vh - var(--header-height) - 64px - var(--spacing-3xl) - 40px);
   overflow-y: auto;
 
@@ -722,16 +821,16 @@
 
 /* 总标题 */
 .life-calendar-header {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   text-align: center;
 }
 
 .calendar-title {
   font-size: 10px;
-  font-weight: 400;
+  font-weight: 500;  /* 增加字重 */
   color: var(--color-text-tertiary);
-  opacity: 0.3;
-  letter-spacing: 1px;
+  opacity: 0.4;  /* 略微增强 */
+  letter-spacing: 1.5px;  /* 拉宽字距 */
   text-transform: uppercase;
 }
 
@@ -750,13 +849,34 @@
   padding-left: 4px;
 }
 
-/* 年龄（主信息）*/
+/* 年龄（主信息）- 强化刻度标签 */
 .age-primary {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 15px;  /* 从 13px 增加到 15px */
+  font-weight: 600;  /* 从 500 增加到 600 */
   color: var(--color-text-primary);
-  opacity: 0.8;
+  opacity: 0.85;  /* 略微增强 */
   letter-spacing: 0.5px;
+  transition: opacity var(--transition-normal);
+}
+
+/* 当前年龄高亮 */
+.age-primary--current {
+  opacity: 1;
+  color: var(--color-text-primary);
+  position: relative;
+}
+
+.age-primary--current::after {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 12px;
+  background: var(--color-text-primary);
+  border-radius: 2px;
+  opacity: 0.3;
 }
 
 /* 年份（次级信息）*/
@@ -764,7 +884,7 @@
   font-size: 10px;
   font-weight: 400;
   color: var(--color-text-tertiary);
-  opacity: 0.25;
+  opacity: 0.35;  /* 略微增强 */
   letter-spacing: 0.5px;
 }
 
@@ -940,7 +1060,7 @@
 }
 
 /* ========================================
-   月份第一天标记（隐性节奏）
+   月份第一天标记（隐性节奏）- 增强标识
    ======================================== */
 .calendar-day--month-start::before {
   content: '';
@@ -948,8 +1068,8 @@
   left: 0;
   top: 15%;
   bottom: 15%;
-  width: 2px;
-  background-color: rgba(0, 0, 0, 0.15);
+  width: 2.5px;  /* 从 2px 增加到 2.5px */
+  background-color: rgba(0, 0, 0, 0.20);  /* 从 0.15 增加到 0.20 */
   border-radius: 0 1px 1px 0;
 }
 

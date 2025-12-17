@@ -60,6 +60,24 @@ const DiaryUI = (function() {
   }
 
   /**
+   * 解析日期字符串为显示用的各个部分
+   * @param {string} dateKey - 日期键 (YYYY-MM-DD)
+   * @returns {object} 包含年、月、日、星期的对象
+   */
+  function parseDateForDisplay(dateKey) {
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+
+    return {
+      year: year,
+      month: month,
+      day: day,
+      weekday: weekdays[date.getDay()]
+    };
+  }
+
+  /**
    * 生成日期分组的 HTML
    * @param {object} dateGroup - 日期分组对象
    * @returns {string} HTML 字符串
@@ -98,12 +116,21 @@ const DiaryUI = (function() {
       specialMark = '<div class="anniversary-mark" title="纪念日"></div>';
     }
 
+    // 解析日期为新的结构化格式
+    const dateParts = parseDateForDisplay(dateGroup.date);
+
     return `
       <div class="${groupClass}" data-date="${dateGroup.date}">
         ${specialMark}
         <div class="date-divider">
           <div class="date-header">
-            <div class="${labelClass}">${dateGroup.displayDate}</div>
+            <div class="${labelClass}">
+              <span class="date-year">${dateParts.year}</span>
+              <span class="date-month-day">
+                ${dateParts.month}<span class="date-separator">/</span>${dateParts.day}
+              </span>
+              <span class="date-weekday">${dateParts.weekday}</span>
+            </div>
             <button class="weather-selector"
                     data-date="${dateGroup.date}"
                     data-weather="${weather}"
@@ -115,6 +142,38 @@ const DiaryUI = (function() {
         ${entriesHTML}
       </div>
     `;
+  }
+
+  /**
+   * 生成"继续书写"区域的 HTML
+   * @returns {string} HTML 字符串
+   */
+  function generateContinueWritingHTML() {
+    return `
+      <div class="timeline-continue-writing" id="continueWriting">
+        <svg class="continue-writing-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <div class="continue-writing-text">继续书写</div>
+      </div>
+    `;
+  }
+
+  /**
+   * 绑定"继续书写"点击事件
+   */
+  function bindContinueWritingClick() {
+    const continueBtn = document.getElementById('continueWriting');
+    if (continueBtn) {
+      continueBtn.addEventListener('click', () => {
+        // 触发新建记录（与顶部按钮相同的行为）
+        const btnNew = document.getElementById('btnNew');
+        if (btnNew) {
+          btnNew.click();
+        }
+      });
+    }
   }
 
   /**
@@ -153,8 +212,14 @@ const DiaryUI = (function() {
       htmlParts.push(generateDateGroupHTML(dateGroup));
     });
 
+    // 添加"继续书写"区域（时间轴自然延续）
+    htmlParts.push(generateContinueWritingHTML());
+
     // 一次性插入 DOM
     elements.timeline.innerHTML = htmlParts.join('');
+
+    // 绑定"继续书写"点击事件
+    bindContinueWritingClick();
 
     console.log(`✅ 渲染完成：${timelineData.length} 个日期分组`);
   }
@@ -346,10 +411,15 @@ const DiaryUI = (function() {
     // 生成周行HTML
     const weeksHTML = weeks.map(week => generateWeekRowHTML(week)).join('');
 
+    // 判断是否是当前年龄
+    const currentAge = DiaryModels.getAge(birthDate);
+    const isCurrentAge = age === currentAge;
+    const agePrimaryClass = isCurrentAge ? 'age-primary age-primary--current' : 'age-primary';
+
     return `
       <div class="age-section" data-age="${age}">
         <div class="age-header">
-          <span class="age-primary">${ageLabel}</span>
+          <span class="${agePrimaryClass}">${ageLabel}</span>
           <span class="age-secondary">${yearLabel}</span>
         </div>
         <div class="age-calendar-grid">

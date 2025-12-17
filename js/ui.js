@@ -464,8 +464,9 @@ const DiaryUI = (function() {
           // 🆕 标记特殊日期（里程碑）
           const milestone = DiaryStorage.getMilestone(day.dateKey);
           day.isMilestone = !!milestone;
-          day.milestoneType = milestone?.type || null;  // 'milestone' 或 'special'
-          day.milestoneLabel = milestone?.label || '';
+          day.milestoneType = milestone?.type || null;  // 'major_milestone' 或 'milestone'
+          // 优先显示自定义标签，否则显示模板标签
+          day.milestoneLabel = milestone?.customLabel || milestone?.templateLabel || milestone?.label || '';
         }
       });
     });
@@ -538,13 +539,8 @@ const DiaryUI = (function() {
 
       // 🆕 标记特殊日期（只在非生日时显示）
       if (!day.isBirthday && day.isMilestone) {
-        if (day.milestoneType === 'milestone') {
-          // 纪念日：人生重要节点
-          classes.push('calendar-day--anniversary');
-        } else {
-          // 普通特殊日期：值得标记但非节点
-          classes.push('calendar-day--special');
-        }
+        // 所有里程碑类型（major_milestone 和 milestone）都显示为 anniversary 样式
+        classes.push('calendar-day--anniversary');
       }
 
       // tooltip 显示完整日期（含年份和星期）

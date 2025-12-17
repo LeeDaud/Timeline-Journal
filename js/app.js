@@ -764,6 +764,40 @@ const DiaryApp = (function() {
 
 
   /**
+   * ========================================
+   * 右键菜单系统（特殊日期标记）
+   * ========================================
+   */
+
+  // 模板定义：Major Milestones（重大里程碑，≤7个）
+  const MAJOR_MILESTONE_TEMPLATES = [
+    { id: 'graduation', icon: '🎓', label: '毕业/深造', description: '学业结束或进入新的学习阶段' },
+    { id: 'first_job', icon: '💼', label: '首份工作', description: '职业生涯的开始' },
+    { id: 'relocation', icon: '🏠', label: '重大搬迁', description: '搬到新城市或国家' },
+    { id: 'relationship_start', icon: '❤️', label: '恋爱/结婚', description: '重要关系的开始' },
+    { id: 'relationship_end', icon: '💔', label: '分手/离别', description: '重要关系的结束' },
+    { id: 'life_turning', icon: '🌟', label: '人生转折', description: '改变人生轨迹的重大事件' },
+    { id: 'custom', icon: '✨', label: '自定义', description: '输入你的重要节点' }
+  ];
+
+  // 模板定义：Milestones（纪念日，≤20个）
+  const MILESTONE_TEMPLATES = [
+    { id: 'important_decision', icon: '🤔', label: '重要决定', description: '做出了关键的选择' },
+    { id: 'restart', icon: '🔄', label: '重启/新开始', description: '开始新的尝试' },
+    { id: 'mindset_shift', icon: '💡', label: '认知转变', description: '思维方式的改变' },
+    { id: 'new_direction', icon: '🧭', label: '新的方向', description: '找到新的目标或路径' },
+    { id: 'deep_impact', icon: '📍', label: '深刻影响', description: '对你产生深远影响的事' },
+    { id: 'achievement', icon: '🏆', label: '成就/突破', description: '完成重要目标' },
+    { id: 'significant_event', icon: '📌', label: '重要事件', description: '值得记录的特殊经历' },
+    { id: 'custom', icon: '✨', label: '自定义', description: '输入你的纪念日' }
+  ];
+
+  // 当前菜单状态
+  let currentContextMenu = null;
+  let currentMenuDateKey = null;
+  let currentMenuType = null;
+
+  /**
    * 处理日历右键菜单（标记/取消特殊日期）
    * @param {Event} event - 右键点击事件
    */
@@ -778,7 +812,7 @@ const DiaryApp = (function() {
     const dateKey = dayElement.dataset.date;
     if (!dateKey) return;
 
-    // 🆕 检查是否是生日（系统级，禁止修改）
+    // 检查是否是生日（系统级，禁止修改）
     const birthDate = DiaryStorage.getBirthDate();
     if (birthDate && DiaryModels.isBirthday(dateKey, birthDate)) {
       const age = DiaryModels.getAge(birthDate, new Date(dateKey));
@@ -786,68 +820,379 @@ const DiaryApp = (function() {
       return;
     }
 
+    // 关闭已有菜单
+    closeContextMenu();
+
+    // 保存当前日期
+    currentMenuDateKey = dateKey;
+
     // 检查是否已标记
     const existingMilestone = DiaryStorage.getMilestone(dateKey);
 
     if (existingMilestone) {
-      // 已标记：显示类型和标签，询问是否取消
-      const typeLabel = existingMilestone.type === 'milestone' ? '纪念日' : '特殊日期';
-      const displayLabel = existingMilestone.label || '(无备注)';
-      if (confirm(`取消标记\n\n类型：${typeLabel}\n备注：${displayLabel}`)) {
-        DiaryStorage.setMilestone(dateKey, null);
-        // 刷新日历
-        DiaryUI.renderLifeCalendar();
-      }
+      // 已标记：显示删除菜单
+      showRemoveMenu(dateKey, existingMilestone, event.clientX, event.clientY);
     } else {
-      // 未标记：先选择类型
-      const typeChoice = prompt(
-        '标记特殊日期\n\n' +
-        '请选择类型：\n' +
-        '1 = 纪念日（人生重要节点：毕业/入职/结婚/重大转折）\n' +
-        '2 = 普通标记（值得记录但非节点：旅行/搬家/见面）\n\n' +
-        '注：生日由系统自动标记，无需手动添加\n\n' +
-        '输入 1 或 2：'
-      );
-
-      // 用户取消
-      if (typeChoice === null) return;
-
-      // 验证输入
-      const type = typeChoice.trim() === '1' ? 'milestone' :
-                   typeChoice.trim() === '2' ? 'special' : null;
-
-      if (!type) {
-        alert('输入无效，请输入 1 或 2');
-        return;
-      }
-
-      // 🆕 检查是否是生日日期
-      const birthDate = DiaryStorage.getBirthDate();
-      if (birthDate && DiaryModels.isBirthday(dateKey, birthDate)) {
-        alert('这一天是您的生日，由系统自动标记，无需手动添加。');
-        return;
-      }
-
-      // 询问备注
-      const typeLabel = type === 'milestone' ? '纪念日' : '普通标记';
-      const label = prompt(
-        `标记为：${typeLabel}\n\n` +
-        '请输入备注（可选）：'
-      );
-
-      // 用户取消
-      if (label === null) return;
-
-      // 保存标记
-      DiaryStorage.setMilestone(dateKey, {
-        type: type,
-        label: label.trim()
-      });
-
-      // 刷新日历
-      DiaryUI.renderLifeCalendar();
+      // 未标记：显示类型选择菜单
+      showTypeSelectionMenu(dateKey, event.clientX, event.clientY);
     }
   }
+
+  /**
+   * 显示类型选择菜单（第一级：Major Milestone / Milestone）
+   */
+  function showTypeSelectionMenu(dateKey, x, y) {
+    const menu = createContextMenu(dateKey, x, y);
+
+    // Major Milestone 选项
+    const majorItem = createMenuItem('🏛️', '重大里程碑', '人生转折点（最多7个）', () => {
+      // 检查数量限制
+      const existingCount = countMilestonesByType('major_milestone');
+      if (existingCount >= 7) {
+        closeContextMenu();
+        setTimeout(() => {
+          alert('重大里程碑已达上限（7个）\n\n建议：精选最重要的人生节点，保持克制。');
+        }, 200);
+        return;
+      }
+
+      currentMenuType = 'major_milestone';
+      closeContextMenu();
+
+      // 延迟打开第二级菜单，让关闭动画完成
+      setTimeout(() => {
+        showTemplateSelectionMenu(dateKey, 'major_milestone', x, y);
+      }, 180);
+    });
+
+    menu.appendChild(majorItem);
+
+    // Milestone 选项
+    const milestoneItem = createMenuItem('📍', '纪念日', '值得记录的日子（最多20个）', () => {
+      // 检查数量限制
+      const existingCount = countMilestonesByType('milestone');
+      if (existingCount >= 20) {
+        closeContextMenu();
+        setTimeout(() => {
+          alert('纪念日已达上限（20个）\n\n建议：保留最有意义的记录，定期回顾和精简。');
+        }, 200);
+        return;
+      }
+
+      currentMenuType = 'milestone';
+      closeContextMenu();
+
+      // 延迟打开第二级菜单，让关闭动画完成
+      setTimeout(() => {
+        showTemplateSelectionMenu(dateKey, 'milestone', x, y);
+      }, 180);
+    });
+
+    menu.appendChild(milestoneItem);
+
+    document.body.appendChild(menu);
+
+    // 延迟激活（动画效果）
+    setTimeout(() => menu.classList.add('active'), 10);
+  }
+
+  /**
+   * 显示模板选择菜单（第二级：具体模板）
+   */
+  function showTemplateSelectionMenu(dateKey, type, x, y) {
+    const templates = type === 'major_milestone' ? MAJOR_MILESTONE_TEMPLATES : MILESTONE_TEMPLATES;
+    const menu = createContextMenu(dateKey, x, y);
+
+    // 返回按钮
+    const backButton = document.createElement('div');
+    backButton.className = 'context-menu-back';
+    backButton.innerHTML = '<span>←</span><span>返回</span>';
+    backButton.addEventListener('click', (event) => {
+      event.stopPropagation();  // 阻止事件冒泡
+      closeContextMenu();
+
+      // 延迟打开返回菜单
+      setTimeout(() => {
+        showTypeSelectionMenu(dateKey, x, y);
+      }, 180);
+    });
+    menu.appendChild(backButton);
+
+    // 模板选项
+    templates.forEach(template => {
+      const item = createMenuItem(template.icon, template.label, template.description, () => {
+        handleTemplateSelect(dateKey, type, template);
+      });
+      menu.appendChild(item);
+    });
+
+    document.body.appendChild(menu);
+
+    // 延迟激活（动画效果）
+    setTimeout(() => menu.classList.add('active'), 10);
+  }
+
+  /**
+   * 显示删除菜单
+   */
+  function showRemoveMenu(dateKey, milestone, x, y) {
+    const menu = createContextMenu(dateKey, x, y);
+
+    // 显示当前标记信息
+    const typeLabel = milestone.type === 'major_milestone' ? '重大里程碑' : '纪念日';
+    const displayLabel = milestone.customLabel || milestone.templateLabel || '(无标签)';
+
+    const infoItem = document.createElement('div');
+    infoItem.className = 'context-menu-item';
+    infoItem.style.cursor = 'default';
+    infoItem.style.pointerEvents = 'none';
+    infoItem.innerHTML = `
+      <div class="context-menu-icon">${getTemplateIcon(milestone.templateId)}</div>
+      <div class="context-menu-text">
+        <div class="context-menu-label">${displayLabel}</div>
+        <div class="context-menu-description">${typeLabel}</div>
+      </div>
+    `;
+    menu.appendChild(infoItem);
+
+    // 分隔线
+    const divider = document.createElement('div');
+    divider.className = 'context-menu-divider';
+    menu.appendChild(divider);
+
+    // 删除按钮
+    const removeItem = createMenuItem('🗑️', '取消标记', '移除这个特殊日期', () => {
+      DiaryStorage.setMilestone(dateKey, null);
+      DiaryUI.renderLifeCalendar();
+      closeContextMenu();
+
+      // 视觉反馈：脉冲动画
+      highlightCalendarDay(dateKey);
+    }, true);
+
+    menu.appendChild(removeItem);
+
+    document.body.appendChild(menu);
+
+    // 延迟激活（动画效果）
+    setTimeout(() => menu.classList.add('active'), 10);
+  }
+
+  /**
+   * 处理模板选择
+   */
+  function handleTemplateSelect(dateKey, type, template) {
+    closeContextMenu();
+
+    let customLabel = null;
+
+    // 如果是自定义模板，请求用户输入
+    if (template.id === 'custom') {
+      const typeLabel = type === 'major_milestone' ? '重大里程碑' : '纪念日';
+      customLabel = prompt(`${typeLabel} - 自定义标签\n\n请输入标签（建议2-8个字）：`);
+
+      // 用户取消
+      if (customLabel === null) return;
+
+      customLabel = customLabel.trim();
+
+      // 验证输入
+      if (!customLabel) {
+        alert('标签不能为空');
+        return;
+      }
+
+      if (customLabel.length > 12) {
+        alert('标签过长，建议控制在12个字以内');
+        return;
+      }
+    }
+
+    // 保存标记
+    const milestone = {
+      type: type,
+      templateId: template.id,
+      templateLabel: template.label,
+      customLabel: customLabel,
+      description: template.description,
+      createdAt: Date.now()
+    };
+
+    DiaryStorage.setMilestone(dateKey, milestone);
+
+    // 刷新日历
+    DiaryUI.renderLifeCalendar();
+
+    // 视觉反馈：脉冲动画
+    highlightCalendarDay(dateKey);
+
+    // 平滑滚动到标记的日期
+    setTimeout(() => {
+      scrollToCalendarDay(dateKey);
+    }, 300);
+  }
+
+  /**
+   * 创建上下文菜单容器
+   */
+  function createContextMenu(dateKey, x, y) {
+    const menu = document.createElement('div');
+    menu.className = 'context-menu';
+    menu.dataset.dateKey = dateKey;
+
+    // 添加日期头部
+    const header = document.createElement('div');
+    header.className = 'context-menu-header';
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    const displayDate = date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short'
+    });
+    header.innerHTML = `<div class="context-menu-date">${displayDate}</div>`;
+    menu.appendChild(header);
+
+    // 计算菜单位置（避免超出屏幕）
+    menu.style.left = x + 'px';
+    menu.style.top = y + 'px';
+
+    // 添加到DOM后调整位置
+    setTimeout(() => {
+      const rect = menu.getBoundingClientRect();
+
+      // 水平方向调整
+      if (rect.right > window.innerWidth) {
+        menu.style.left = (x - rect.width) + 'px';
+      }
+
+      // 垂直方向调整
+      if (rect.bottom > window.innerHeight) {
+        menu.style.top = (y - rect.height) + 'px';
+      }
+    }, 0);
+
+    currentContextMenu = menu;
+    return menu;
+  }
+
+  /**
+   * 创建菜单项
+   */
+  function createMenuItem(icon, label, description, onClick, isDanger = false) {
+    const item = document.createElement('button');
+    item.className = 'context-menu-item' + (isDanger ? ' context-menu-item--danger' : '');
+
+    item.innerHTML = `
+      <div class="context-menu-icon">${icon}</div>
+      <div class="context-menu-text">
+        <div class="context-menu-label">${label}</div>
+        ${description ? `<div class="context-menu-description">${description}</div>` : ''}
+      </div>
+    `;
+
+    item.addEventListener('click', (event) => {
+      event.stopPropagation();  // 阻止事件冒泡，避免触发全局关闭
+      onClick(event);
+    });
+    return item;
+  }
+
+  /**
+   * 关闭上下文菜单
+   */
+  function closeContextMenu() {
+    if (currentContextMenu) {
+      currentContextMenu.classList.remove('active');
+      setTimeout(() => {
+        if (currentContextMenu && currentContextMenu.parentNode) {
+          currentContextMenu.parentNode.removeChild(currentContextMenu);
+        }
+        currentContextMenu = null;
+      }, 150);
+    }
+  }
+
+  /**
+   * 统计指定类型的里程碑数量
+   */
+  function countMilestonesByType(type) {
+    const data = DiaryStorage.loadData();
+    if (!data.milestones) return 0;
+
+    return Object.values(data.milestones).filter(m => m && m.type === type).length;
+  }
+
+  /**
+   * 获取模板图标
+   */
+  function getTemplateIcon(templateId) {
+    const allTemplates = [...MAJOR_MILESTONE_TEMPLATES, ...MILESTONE_TEMPLATES];
+    const template = allTemplates.find(t => t.id === templateId);
+    return template ? template.icon : '📍';
+  }
+
+  /**
+   * 高亮日历某一天（脉冲动画）
+   */
+  function highlightCalendarDay(dateKey) {
+    const dayElement = document.querySelector(`.calendar-day[data-date="${dateKey}"]`);
+    if (dayElement) {
+      dayElement.classList.add('calendar-day--active');
+      setTimeout(() => {
+        dayElement.classList.remove('calendar-day--active');
+      }, 800);
+    }
+  }
+
+  /**
+   * 平滑滚动到日历某一天
+   */
+  function scrollToCalendarDay(dateKey) {
+    const dayElement = document.querySelector(`.calendar-day[data-date="${dateKey}"]`);
+    if (!dayElement) return;
+
+    const calendar = document.querySelector('.life-calendar');
+    if (!calendar) return;
+
+    const calendarRect = calendar.getBoundingClientRect();
+    const dayRect = dayElement.getBoundingClientRect();
+
+    // 检查是否在可视区域内
+    const isVisible = dayRect.top >= calendarRect.top && dayRect.bottom <= calendarRect.bottom;
+
+    if (!isVisible) {
+      // 计算目标位置（居中显示）
+      const targetOffsetTop = dayElement.offsetTop;
+      const calendarHeight = calendar.clientHeight;
+      const dayHeight = dayElement.clientHeight;
+      const scrollTo = targetOffsetTop - (calendarHeight / 2) + (dayHeight / 2);
+
+      // 平滑滚动
+      calendar.scrollTo({
+        top: scrollTo,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  // 点击页面其他地方时关闭菜单（延迟检测，避免菜单切换时误触发）
+  document.addEventListener('click', (event) => {
+    // 延迟检测，让菜单内部的点击事件先处理
+    setTimeout(() => {
+      if (currentContextMenu && !currentContextMenu.contains(event.target)) {
+        closeContextMenu();
+      }
+    }, 0);
+  });
+
+  // ESC 键关闭菜单
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && currentContextMenu) {
+      closeContextMenu();
+    }
+  });
 
   /**
    * 打开编辑器并预填日期

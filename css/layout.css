@@ -39,6 +39,12 @@ body {
   letter-spacing: 0.5px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 /* 主内容区 */
 .app-main {
   margin-top: calc(var(--header-height) + 64px);  /* header + time-anchor */

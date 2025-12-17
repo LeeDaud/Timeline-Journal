@@ -1232,6 +1232,380 @@ const DiaryApp = (function() {
     }, 100);
   }
 
+  /**
+   * ========================================
+   * 人生节点回顾模式（Life Review Mode）
+   * ========================================
+   */
+
+  // 全局状态
+  let currentMode = 'diary';  // 'diary' | 'review'
+  let reviewNodes = [];       // 回顾模式的节点列表
+  let currentNodeIndex = null;
+
+  /**
+   * 获取所有人生节点（按时间正序）
+   * @returns {Array} 节点数组
+   */
+  function getLifeReviewNodes() {
+    const birthDate = DiaryStorage.getBirthDate();
+    const milestones = DiaryStorage.loadData().milestones || {};
+    const entries = DiaryStorage.getAllEntries();
+    const nodes = [];
+
+    // 1. 收集所有标记日期
+    Object.keys(milestones).forEach(dateKey => {
+      const milestone = milestones[dateKey];
+      const isBirthdayDate = DiaryModels.isBirthday(dateKey, birthDate);
+
+      // 跳过生日日期（稍后单独处理）
+      if (!isBirthdayDate) {
+        // 检查该日期是否有日记
+        const hasEntry = entries.some(e =>
+          !e.deleted && DiaryModels.formatDateKey(new Date(e.createdAt)) === dateKey
+        );
+
+        nodes.push({
+          dateKey: dateKey,
+          type: milestone.type,  // 'major_milestone' | 'milestone'
+          templateId: milestone.templateId,
+          icon: getTemplateIcon(milestone.templateId),
+          title: milestone.customLabel || milestone.templateLabel,
+          description: milestone.description || '',
+          timestamp: new Date(dateKey).getTime(),
+          isBirthday: false,
+          hasEntry: hasEntry
+        });
+      }
+    });
+
+    // 2. 添加所有生日节点
+    if (birthDate) {
+      const birth = new Date(birthDate);
+      const today = new Date();
+      const currentAge = DiaryModels.getAge(birthDate);
+
+      for (let age = 0; age <= currentAge; age++) {
+        const birthdayDate = new Date(birth);
+        birthdayDate.setFullYear(birth.getFullYear() + age);
+
+        // 不超过今天
+        if (birthdayDate > today) break;
+
+        const dateKey = DiaryModels.formatDateKey(birthdayDate);
+
+        // 检查该日期是否有日记
+        const hasEntry = entries.some(e =>
+          !e.deleted && DiaryModels.formatDateKey(new Date(e.createdAt)) === dateKey
+        );
+
+        nodes.push({
+          dateKey: dateKey,
+          type: 'birthday',
+          templateId: 'birthday',
+          icon: '🎂',
+          title: `${age} 周岁生日`,
+          description: age === 0 ? '生命的起点' : '',
+          timestamp: birthdayDate.getTime(),
+          isBirthday: true,
+          age: age,
+          hasEntry: hasEntry
+        });
+      }
+    }
+
+    // 3. 按时间正序排序（从最早到最新）
+    nodes.sort((a, b) => a.timestamp - b.timestamp);
+
+    return nodes;
+  }
+
+  /**
+   * 生成单个节点的 HTML
+   * @param {object} node - 节点对象
+   * @param {number} index - 节点索引
+   * @returns {string} HTML 字符串
+   */
+  function generateReviewNodeHTML(node, index) {
+    const date = new Date(node.dateKey);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+
+    // 节点类型样式
+    let nodeClass = 'review-node';
+    if (node.isBirthday) {
+      nodeClass += ' review-node--birthday';
+    } else if (node.type === 'major_milestone') {
+      nodeClass += ' review-node--major';
+    } else {
+      nodeClass += ' review-node--milestone';
+    }
+
+    // 是否有日记的标记
+    const entryIndicator = node.hasEntry
+      ? '<span class="review-node-entry-indicator">●</span>'
+      : '';
+
+    return `
+      <div class="${nodeClass}"
+           data-date="${node.dateKey}"
+           data-index="${index}">
+
+        ${index > 0 ? '<div class="review-node-spacer"></div>' : ''}
+
+        <div class="review-node-content">
+
+          <div class="review-node-meta">
+            ${node.isBirthday ? node.age + ' 岁' : year}
+          </div>
+
+          <div class="review-node-title">
+            <span class="review-node-icon">${node.icon}</span>
+            <span class="review-node-label">${node.title}</span>
+            ${entryIndicator}
+          </div>
+
+          <div class="review-node-date">
+            ${month}月${day}日
+          </div>
+
+          ${node.description ? `
+            <div class="review-node-description">
+              ${node.description}
+            </div>
+          ` : ''}
+
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * 渲染回顾模式时间轴
+   */
+  function renderReviewTimeline() {
+    const timeline = document.getElementById('timeline');
+    if (!timeline) return;
+
+    // 获取所有节点
+    reviewNodes = getLifeReviewNodes();
+
+    if (reviewNodes.length === 0) {
+      timeline.innerHTML = `
+        <div class="empty-state" style="padding-top: 120px;">
+          <p class="empty-hint">还没有标记任何人生节点</p>
+          <p class="empty-hint" style="margin-top: 12px; font-size: 11px; opacity: 0.5;">
+            在左侧日历上右键标记重要日期
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    // 生成HTML
+    const htmlParts = reviewNodes.map((node, index) => generateReviewNodeHTML(node, index));
+    timeline.innerHTML = htmlParts.join('');
+
+    // 绑定节点点击事件
+    const nodeElements = timeline.querySelectorAll('.review-node');
+    nodeElements.forEach(nodeEl => {
+      nodeEl.addEventListener('click', () => {
+        const dateKey = nodeEl.dataset.date;
+        handleReviewNodeClick(dateKey);
+      });
+    });
+  }
+
+  /**
+   * 处理回顾节点点击
+   */
+  function handleReviewNodeClick(dateKey) {
+    // 高亮当前节点
+    document.querySelectorAll('.review-node').forEach(node => {
+      node.classList.remove('review-node--active');
+    });
+
+    const clickedNode = document.querySelector(`.review-node[data-date="${dateKey}"]`);
+    if (clickedNode) {
+      clickedNode.classList.add('review-node--active');
+    }
+
+    // 退出回顾模式，跳转到该日期
+    exitReviewModeToDate(dateKey);
+  }
+
+  /**
+   * 进入回顾模式
+   */
+  function enterReviewMode() {
+    if (currentMode === 'review') return;
+
+    currentMode = 'review';
+
+    const timeline = document.getElementById('timeline');
+    const lifeCalendar = document.getElementById('lifeCalendar');
+    const btnToggle = document.getElementById('btnModeToggle');
+    const toggleText = btnToggle.querySelector('.mode-toggle-text');
+
+    // 1. 淡出当前内容
+    timeline.classList.add('timeline-container--fade-out');
+
+    // 2. 延迟后切换渲染模式
+    setTimeout(() => {
+      // 更新按钮文本
+      toggleText.textContent = toggleText.dataset.review;
+
+      // 添加回顾模式class
+      timeline.classList.add('timeline-container--review-mode');
+      lifeCalendar.classList.add('life-calendar--review-mode');
+
+      // 渲染回顾时间轴
+      renderReviewTimeline();
+
+      // 移除淡出class
+      timeline.classList.remove('timeline-container--fade-out');
+
+      // 延迟激活淡入
+      setTimeout(() => {
+        timeline.classList.add('active');
+
+        // 滚动到顶部（最早的节点）
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }, 50);
+    }, 300);
+  }
+
+  /**
+   * 退出回顾模式（回到今天）
+   */
+  function exitReviewMode() {
+    if (currentMode === 'diary') return;
+
+    currentMode = 'diary';
+
+    const timeline = document.getElementById('timeline');
+    const lifeCalendar = document.getElementById('lifeCalendar');
+    const btnToggle = document.getElementById('btnModeToggle');
+    const toggleText = btnToggle.querySelector('.mode-toggle-text');
+
+    // 1. 淡出回顾内容
+    timeline.classList.remove('active');
+    timeline.classList.add('timeline-container--fade-out');
+
+    // 2. 延迟后恢复日记模式
+    setTimeout(() => {
+      // 更新按钮文本
+      toggleText.textContent = toggleText.dataset.diary;
+
+      // 移除回顾模式class
+      timeline.classList.remove('timeline-container--review-mode');
+      lifeCalendar.classList.remove('life-calendar--review-mode');
+
+      // 恢复日记模式渲染
+      refreshTimeline();
+
+      // 移除淡出class
+      timeline.classList.remove('timeline-container--fade-out');
+
+      // 延迟激活淡入
+      setTimeout(() => {
+        // 滚动回今天
+        scrollToToday();
+      }, 50);
+    }, 300);
+  }
+
+  /**
+   * 从回顾模式退出并跳转到指定日期
+   */
+  function exitReviewModeToDate(dateKey) {
+    currentMode = 'diary';
+
+    const timeline = document.getElementById('timeline');
+    const lifeCalendar = document.getElementById('lifeCalendar');
+    const btnToggle = document.getElementById('btnModeToggle');
+    const toggleText = btnToggle.querySelector('.mode-toggle-text');
+
+    // 1. 淡出回顾内容
+    timeline.classList.remove('active');
+    timeline.classList.add('timeline-container--fade-out');
+
+    // 2. 延迟后恢复日记模式
+    setTimeout(() => {
+      // 更新按钮文本
+      toggleText.textContent = toggleText.dataset.diary;
+
+      // 移除回顾模式class
+      timeline.classList.remove('timeline-container--review-mode');
+      lifeCalendar.classList.remove('life-calendar--review-mode');
+
+      // 恢复日记模式渲染
+      refreshTimeline();
+
+      // 移除淡出class
+      timeline.classList.remove('timeline-container--fade-out');
+
+      // 延迟后跳转到指定日期
+      setTimeout(() => {
+        // 查找该日期是否有记录
+        const dateGroup = document.querySelector(`.date-group[data-date="${dateKey}"]`);
+
+        if (dateGroup) {
+          // 有记录：滚动到该日期
+          scrollToDateGroup(dateGroup);
+        } else {
+          // 无记录：打开编辑器
+          scrollToEmptyDate(dateKey);
+        }
+      }, 400);
+    }, 300);
+  }
+
+  /**
+   * 滚动到今天
+   */
+  function scrollToToday() {
+    const today = DiaryModels.formatDateKey(new Date());
+    const todayGroup = document.querySelector(`.date-group[data-date="${today}"]`);
+
+    if (todayGroup) {
+      setTimeout(() => {
+        scrollToDateGroup(todayGroup);
+      }, 300);
+    } else {
+      // 没有今天的记录，滚动到时间轴顶部
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  }
+
+  /**
+   * 切换模式
+   */
+  function toggleMode() {
+    if (currentMode === 'diary') {
+      enterReviewMode();
+    } else {
+      exitReviewMode();
+    }
+  }
+
+  /**
+   * 绑定模式切换按钮
+   */
+  function bindModeToggle() {
+    const btnToggle = document.getElementById('btnModeToggle');
+    if (btnToggle) {
+      btnToggle.addEventListener('click', toggleMode);
+    }
+  }
+
   // 公开接口
   return {
     init,

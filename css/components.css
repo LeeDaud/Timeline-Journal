@@ -1,3 +1,26 @@
+/* 模式切换按钮 */
+.btn-mode-toggle {
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-divider);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-mode-toggle:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-tertiary);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.btn-mode-toggle:active {
+  transform: scale(0.95);
+}
+
 /* 新建按钮 */
 .btn-new {
   width: 32px;
@@ -1219,4 +1242,206 @@
   font-size: 12px;
   color: var(--color-text-tertiary);
   opacity: 0.4;
+}
+
+/* ========================================
+   人生节点回顾模式
+   ======================================== */
+
+/* 时间轴容器（回顾模式）*/
+.timeline-container--review-mode {
+  max-width: 560px !important;
+  margin: 0 auto;
+  padding-top: 120px !important;
+  padding-bottom: 120px !important;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.timeline-container--review-mode.active {
+  opacity: 1;
+}
+
+/* 节点间的时间留白（表达"未标记的时间流"）*/
+.review-node-spacer {
+  height: 160px;
+  position: relative;
+}
+
+/* 时间流动的隐喻：垂直虚线 */
+.review-node-spacer::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.06) 20%,
+    rgba(0, 0, 0, 0.06) 80%,
+    transparent 100%
+  );
+}
+
+/* 节点容器 */
+.review-node {
+  position: relative;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  margin-bottom: 0;
+}
+
+.review-node:hover {
+  transform: scale(1.02);
+}
+
+/* 节点内容区 */
+.review-node-content {
+  text-align: center;
+  padding: 40px 24px;
+  position: relative;
+  transition: all var(--transition-normal);
+}
+
+/* 年份/年龄（弱信息，极淡）*/
+.review-node-meta {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.25;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+/* 节点标题（核心信息）*/
+.review-node-title {
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--color-text-primary);
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.review-node-icon {
+  font-size: 24px;
+}
+
+.review-node-label {
+  /* 核心标签 */
+}
+
+/* 有日记标记（右侧小圆点）*/
+.review-node-entry-indicator {
+  font-size: 8px;
+  color: var(--color-text-primary);
+  opacity: 0.3;
+  margin-left: 4px;
+}
+
+/* 日期 */
+.review-node-date {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+
+/* 可选描述 */
+.review-node-description {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  opacity: 0.6;
+  line-height: 1.6;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   节点边框（层级表达）
+   ======================================== */
+
+/* 系统级：生日（最高优先级）*/
+.review-node--birthday .review-node-content {
+  border: 2px solid var(--color-birthday);
+  border-radius: 4px;
+  background-color: var(--color-birthday-bg);
+}
+
+.review-node--birthday .review-node-title {
+  font-size: 22px;
+  font-weight: 400;
+}
+
+/* 层级 1：重大里程碑 */
+.review-node--major .review-node-content {
+  border: 1.5px solid var(--color-anniversary);
+  border-radius: 4px;
+  background-color: var(--color-anniversary-bg);
+}
+
+/* 层级 2：纪念日 */
+.review-node--milestone .review-node-content {
+  border: 1px solid rgba(139, 99, 56, 0.4);
+  border-radius: 4px;
+  background-color: rgba(139, 99, 56, 0.03);
+}
+
+/* Hover 效果 */
+.review-node:hover .review-node-content {
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
+}
+
+/* 激活状态（点击后高亮）*/
+.review-node--active .review-node-content {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+  transform: scale(1.02);
+}
+
+/* ========================================
+   左侧日历在回顾模式的变化
+   ======================================== */
+
+/* 回顾模式：淡化未标记日期 */
+.life-calendar--review-mode .calendar-day:not(.calendar-day--birthday):not(.calendar-day--anniversary) {
+  opacity: 0.05 !important;
+  pointer-events: none;
+}
+
+/* 回顾模式：标记日期保持正常 */
+.life-calendar--review-mode .calendar-day--birthday,
+.life-calendar--review-mode .calendar-day--anniversary {
+  opacity: 1 !important;
+  pointer-events: all;
+}
+
+/* 回顾模式：隐藏周数和星期头 */
+.life-calendar--review-mode .week-number {
+  opacity: 0.1;
+}
+
+.life-calendar--review-mode .calendar-weekday-header {
+  opacity: 0.3;
+}
+
+/* ========================================
+   模式切换淡入淡出动画
+   ======================================== */
+
+.timeline-container--fade-out {
+  opacity: 0 !important;
+  transition: opacity 300ms ease;
+}
+
+.timeline-container--fade-in {
+  opacity: 1 !important;
+  transition: opacity 800ms ease;
 }

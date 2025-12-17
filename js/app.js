@@ -170,6 +170,9 @@ const DiaryApp = (function() {
    * 绑定事件监听器
    */
   function bindEvents() {
+    // 模式切换按钮
+    bindModeToggle();
+
     // 新建按钮（顶部）
     const btnNew = document.getElementById('btnNew');
     if (btnNew) {

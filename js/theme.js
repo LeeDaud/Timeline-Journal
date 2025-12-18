@@ -65,21 +65,21 @@
     },
 
     /**
-     * 更新主题切换按钮的图标
+     * 更新主题切换按钮的文本
      * @param {string} preference - 用户偏好
      * @param {string} effectiveTheme - 实际主题
      */
     updateThemeIcon(preference, effectiveTheme) {
-      const icon = document.querySelector('.theme-icon');
-      if (!icon) return;
+      const text = document.querySelector('.theme-text');
+      if (!text) return;
 
-      // 根据用户偏好和实际主题决定图标
+      // 显示当前状态的文本
       if (preference === THEME_AUTO) {
-        // 自动模式：显示当前实际主题的反向图标
-        icon.textContent = effectiveTheme === THEME_DARK ? '☀️' : '🌙';
+        text.textContent = '自动';
+      } else if (preference === THEME_LIGHT) {
+        text.textContent = '日间';
       } else {
-        // 手动模式：显示当前主题的反向图标
-        icon.textContent = effectiveTheme === THEME_DARK ? '☀️' : '🌙';
+        text.textContent = '夜间';
       }
     },
 

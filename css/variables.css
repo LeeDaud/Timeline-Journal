@@ -23,10 +23,10 @@
   --spacing-md: 20px;
   --spacing-lg: 28px;                 /* 增加基础间距 */
   --spacing-xl: 48px;                 /* 日常节奏停顿 */
-  --spacing-2xl: 64px;                /* 重要节奏停顿 */
-  --spacing-3xl: 80px;                /* 纪念日级别留白 */
-  --spacing-4xl: 120px;               /* 生日级别留白（新增）*/
-  --spacing-5xl: 160px;               /* 年份级别留白（新增）*/
+  --spacing-2xl: 48px;                /* 重要节奏停顿（基数）*/
+  --spacing-3xl: 72px;                /* 纪念日级别留白（1.5x）*/
+  --spacing-4xl: 108px;               /* 生日级别留白（1.5x）*/
+  --spacing-5xl: 162px;               /* 年份级别留白（1.5x）*/
 
   /* 布局 - 优化阅读体验 */
   --container-max-width: 680px;       /* 内容区最大宽度（收窄，更接近书页）*/
@@ -102,7 +102,7 @@
 
     /* ========== 文字层级（暖色调，模拟烛光/台灯）========== */
     --color-text-primary: #e8e0d5;      /* 主文字：略带米色的白（92% 亮度）*/
-    --color-text-secondary: #a89f91;    /* 次要文字：暖灰（时间戳）*/
+    --color-text-secondary: #9ba5a8;    /* 次要文字：冷灰（时间戳）- 统一色温 */
     --color-text-tertiary: #6e6860;     /* 三级文字：深暖灰（日期标签）*/
     --color-text-ghost: #484440;        /* 幽灵文字：年份水印等装饰性元素 */
 
@@ -133,10 +133,10 @@
     --line-height-normal: 1.8;          /* 从 1.7 增加 */
 
     /* ========== 间距增加（深色背景下需要更夸张的留白）========== */
-    --spacing-2xl: 72px;                /* 从 64px 增加 */
-    --spacing-3xl: 88px;                /* 从 80px 增加 */
-    --spacing-4xl: 132px;               /* 从 120px 增加 */
-    --spacing-5xl: 176px;               /* 从 160px 增加 */
+    --spacing-2xl: 56px;                /* 基数（比浅色略大）*/
+    --spacing-3xl: 84px;                /* 1.5x */
+    --spacing-4xl: 126px;               /* 1.5x */
+    --spacing-5xl: 189px;               /* 1.5x */
 
     /* ========== 动画速度（深色模式下慢一点更舒缓）========== */
     --transition-normal: 400ms ease;    /* 从 300ms 延长 */
@@ -163,7 +163,7 @@
 
   /* ========== 文字层级（暖色调，模拟烛光/台灯）========== */
   --color-text-primary: #e8e0d5;      /* 主文字：略带米色的白（92% 亮度）*/
-  --color-text-secondary: #a89f91;    /* 次要文字：暖灰（时间戳）*/
+  --color-text-secondary: #9ba5a8;    /* 次要文字：冷灰（时间戳）- 统一色温 */
   --color-text-tertiary: #6e6860;     /* 三级文字：深暖灰（日期标签）*/
   --color-text-ghost: #484440;        /* 幽灵文字：年份水印等装饰性元素 */
 
@@ -194,10 +194,10 @@
   --line-height-normal: 1.8;          /* 从 1.7 增加 */
 
   /* ========== 间距增加（深色背景下需要更夸张的留白）========== */
-  --spacing-2xl: 72px;                /* 从 64px 增加 */
-  --spacing-3xl: 88px;                /* 从 80px 增加 */
-  --spacing-4xl: 132px;               /* 从 120px 增加 */
-  --spacing-5xl: 176px;               /* 从 160px 增加 */
+  --spacing-2xl: 56px;                /* 基数（比浅色略大）*/
+  --spacing-3xl: 84px;                /* 1.5x */
+  --spacing-4xl: 126px;               /* 1.5x */
+  --spacing-5xl: 189px;               /* 1.5x */
 
   /* ========== 动画速度（深色模式下慢一点更舒缓）========== */
   --transition-normal: 400ms ease;    /* 从 300ms 延长 */
@@ -251,10 +251,10 @@
   --line-height-normal: 1.7;
 
   /* 恢复浅色模式的间距 */
-  --spacing-2xl: 64px;
-  --spacing-3xl: 80px;
-  --spacing-4xl: 120px;
-  --spacing-5xl: 160px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 72px;
+  --spacing-4xl: 108px;
+  --spacing-5xl: 162px;
 
   /* 恢复浅色模式的动画速度 */
   --transition-normal: 300ms ease;

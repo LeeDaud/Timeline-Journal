@@ -173,17 +173,18 @@ const DiaryApp = (function() {
     // 模式切换按钮
     bindModeToggle();
 
-    // 新建按钮（顶部）
-    const btnNew = document.getElementById('btnNew');
-    if (btnNew) {
-      btnNew.addEventListener('click', handleNew);
-    }
+    // 🆕 移除旧的新建按钮（改用顶部写作入口）
+    // 新建按钮（顶部）- 已移除
+    // const btnNew = document.getElementById('btnNew');
+    // if (btnNew) {
+    //   btnNew.addEventListener('click', handleNew);
+    // }
 
-    // 底部浮动按钮
-    const btnAddFloat = document.getElementById('btnAddFloat');
-    if (btnAddFloat) {
-      btnAddFloat.addEventListener('click', handleNew);
-    }
+    // 底部浮动按钮 - 已移除
+    // const btnAddFloat = document.getElementById('btnAddFloat');
+    // if (btnAddFloat) {
+    //   btnAddFloat.addEventListener('click', handleNew);
+    // }
 
     // 时间轴点击（事件委托）
     const timeline = document.getElementById('timeline');
@@ -223,11 +224,12 @@ const DiaryApp = (function() {
   }
 
   /**
-   * 处理新建记录
+   * 处理新建记录（已废弃，改用顶部写作入口）
+   * 保留此函数以防后续需要
    */
-  function handleNew() {
-    DiaryUI.openEditor(null);
-  }
+  // function handleNew() {
+  //   DiaryUI.openEditor(null);
+  // }
 
   /**
    * 处理时间轴鼠标悬停（联动到左侧日历）

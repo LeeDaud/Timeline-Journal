@@ -20,12 +20,12 @@
       <h1 class="app-title">日记</h1>
       <div class="header-actions">
         <button class="btn-mode-toggle" id="btnModeToggle" aria-label="切换模式">
-          <span class="mode-toggle-text" data-diary="📝 日记" data-review="⏳ 回顾">📝 日记</span>
+          <span class="mode-toggle-text" data-diary="日记" data-review="回顾">日记</span>
         </button>
         <button class="btn-theme-toggle" id="btnThemeToggle" aria-label="切换主题" title="切换日间/夜间模式">
-          <span class="theme-icon">☀️</span>
+          <span class="theme-text">自动</span>
         </button>
-        <button class="btn-new" id="btnNew" aria-label="新建记录">+</button>
+        <!-- 移除旧的新建按钮，改用下方的写作入口 -->
       </div>
     </div>
   </header>
@@ -70,12 +70,35 @@
 
     <!-- 右侧时间轴 -->
     <div class="timeline-wrapper">
-      <div class="timeline-container" id="timeline">
-        <!-- 时间轴内容将通过 JS 动态渲染到这里 -->
+      <div class="timeline-container" id="timelineContainer">
 
-        <!-- 空状态（初次使用时显示） -->
-        <div class="empty-state" id="emptyState">
-          <p class="empty-hint">开始记录</p>
+        <!-- 🆕 写作入口 - 安静的书写空间 -->
+        <div class="writing-entry" id="writingEntry">
+          <textarea
+            class="writing-entry-input"
+            id="writingEntryInput"
+            placeholder="记录你此刻的想法…"
+            rows="1"
+            data-min-rows="1"
+            data-max-rows="12"
+          ></textarea>
+
+          <!-- 提交按钮（默认隐藏，聚焦后显示）-->
+          <button class="writing-entry-submit" id="writingEntrySubmit" aria-label="提交">
+            <svg class="submit-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 时间轴内容 -->
+        <div id="timeline">
+          <!-- 时间轴内容将通过 JS 动态渲染到这里 -->
+
+          <!-- 空状态（初次使用时显示） -->
+          <div class="empty-state" id="emptyState">
+            <p class="empty-hint">开始记录</p>
+          </div>
         </div>
       </div>
     </div>
@@ -101,18 +124,14 @@
     </div>
   </div>
 
-  <!-- 底部浮动添加按钮 -->
-  <button class="btn-add-float" id="btnAddFloat" aria-label="新建日记">
-    <svg class="btn-add-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  </button>
+  <!-- 移除底部浮动按钮，改用顶部写作入口 -->
 
   <!-- JavaScript -->
   <script src="js/theme.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/models.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/writing-entry.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

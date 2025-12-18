@@ -23,10 +23,8 @@
 
 /* 主题切换按钮 */
 .btn-theme-toggle {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  font-size: 16px;
+  padding: 6px 12px;
+  font-size: 12px;
   color: var(--color-text-secondary);
   background: transparent;
   border: 1px solid var(--color-divider);
@@ -36,6 +34,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 }
 
 .btn-theme-toggle:hover {
@@ -48,15 +47,17 @@
   transform: scale(0.95);
 }
 
-.theme-icon {
+.theme-text {
   display: block;
   line-height: 1;
-  transition: transform var(--transition-normal);
+  font-size: 12px;
+  font-weight: 400;
+  transition: opacity var(--transition-normal);
 }
 
 /* 主题切换动画 */
-.btn-theme-toggle:active .theme-icon {
-  transform: rotate(180deg);
+.btn-theme-toggle:active .theme-text {
+  opacity: 0.6;
 }
 
 /* 新建按钮 */
@@ -264,12 +265,7 @@
   font-weight: 400;
   color: var(--color-text-secondary);
   opacity: var(--date-opacity-default);
-  transition: all var(--transition-normal);
   line-height: 1;
-}
-
-.date-label:hover {
-  opacity: var(--date-opacity-hover);
 }
 
 /* 年份 - 前缀，极弱 */
@@ -2299,5 +2295,255 @@
 
   .life-calendar--review-mode .calendar-day:not(.calendar-day--birthday):not(.calendar-day--anniversary) {
     opacity: 0.05 !important;
+  }
+}
+
+/* ========================================
+   写作入口 - 安静的书写空间
+   设计理念：
+   - 消失的界面：默认低存在感，聚焦时自然展开
+   - 无工具感：像一页空白纸，而非表单
+   - 连续性：写完即回到时间轴，无跳动无弹窗
+   ======================================== */
+
+.writing-entry {
+  position: relative;
+  width: 100%;
+  margin: 0 0 var(--spacing-3xl);  /* 80-88px 底部间距，与时间轴拉开距离 */
+
+  /* 提交时的淡出效果 */
+  transition: opacity 200ms ease;
+}
+
+.writing-entry.submitting {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* 输入区域 */
+.writing-entry-input {
+  width: 100%;
+  min-height: 60px;
+  max-height: 400px;
+  padding: 20px 64px 20px 24px; /* 右侧留空给提交按钮 */
+
+  /* 浅色模式背景 */
+  background-color: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  color: var(--color-text-primary);
+
+  /* 大圆角 - 柔和，像纸张边缘 */
+  border-radius: 12px;
+
+  /* 字体 */
+  font-size: var(--font-size-content);
+  line-height: var(--line-height-content);
+  font-family: inherit;
+  font-weight: 400;
+
+  /* 去除默认样式 */
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+  overflow-y: hidden;  /* 默认隐藏滚动条，通过 JS 控制高度 */
+
+  /* 过渡 */
+  transition: background-color var(--transition-normal),
+              border-color var(--transition-normal),
+              box-shadow var(--transition-normal),
+              height 150ms ease;  /* 高度变化也有过渡 */
+}
+
+/* Placeholder 样式 - 安静的邀请 */
+.writing-entry-input::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 0.35;
+  font-weight: 300;
+  letter-spacing: 0.3px;
+}
+
+/* 聚焦状态 - 微妙的抬升感 */
+.writing-entry-input:focus {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 提交按钮 */
+.writing-entry-submit {
+  position: absolute;
+  right: 12px;
+  bottom: 16px;
+
+  width: 36px;
+  height: 36px;
+  padding: 0;
+
+  background-color: var(--color-text-primary);
+  border: none;
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  /* 默认隐藏 */
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+
+  /* 过渡 */
+  transition: opacity var(--transition-normal),
+              transform var(--transition-normal),
+              background-color var(--transition-fast);
+
+  /* 确保在输入框上方 */
+  z-index: 1;
+}
+
+/* 聚焦时显示按钮 */
+.writing-entry-input:focus ~ .writing-entry-submit,
+.writing-entry.submitting .writing-entry-submit {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: all;
+}
+
+/* 提交按钮 hover */
+.writing-entry-submit:hover {
+  background-color: var(--color-text-secondary);
+  transform: scale(1.05);
+}
+
+/* 提交按钮 active */
+.writing-entry-submit:active {
+  transform: scale(0.95);
+}
+
+/* 提交图标 */
+.submit-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  margin: 0 auto;
+}
+
+.submit-icon path {
+  fill: var(--color-bg-primary);
+}
+
+/* ========================================
+   新记录的入场动画
+   ======================================== */
+
+.entry-fade-in {
+  animation: entrySlideIn 300ms ease-out;
+}
+
+@keyframes entrySlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   深色模式适配
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  .writing-entry-input {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .writing-entry-input:focus {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.10);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .writing-entry-input::placeholder {
+    opacity: 0.4;
+  }
+}
+
+[data-theme="dark"] .writing-entry-input {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .writing-entry-input:focus {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.10);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .writing-entry-input::placeholder {
+  opacity: 0.4;
+}
+
+/* 日间模式的提交按钮样式 */
+[data-theme="light"] .writing-entry-submit {
+  background-color: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .writing-entry-submit:hover {
+  background-color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+}
+
+[data-theme="light"] .submit-icon path {
+  fill: var(--color-text-primary);  /* 日间模式：深色图标 */
+}
+
+[data-theme="light"] .writing-entry-submit:hover .submit-icon path {
+  fill: var(--color-bg-primary);  /* hover 时：浅色图标 */
+}
+
+/* 深色模式的提交按钮图标颜色 */
+@media (prefers-color-scheme: dark) {
+  .submit-icon path {
+    fill: #0f1214;  /* 深色背景色 */
+  }
+}
+
+[data-theme="dark"] .submit-icon path {
+  fill: #0f1214;
+}
+
+/* ========================================
+   响应式调整
+   ======================================== */
+
+@media (min-width: 768px) {
+  .writing-entry-input {
+    padding: 24px 68px 24px 28px;
+  }
+
+  .writing-entry-submit {
+    right: 16px;
+    bottom: 20px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .submit-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .writing-entry {
+    margin-bottom: var(--spacing-2xl);  /* 移动端减少底部间距 */
+  }
+
+  .writing-entry-input {
+    font-size: 15px;  /* 移动端字号略小 */
+    padding: 18px 56px 18px 20px;
   }
 }

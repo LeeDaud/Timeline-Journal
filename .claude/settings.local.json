@@ -4,7 +4,9 @@
       "Bash(mkdir:*)",
       "Bash(wc:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$(cat <<''EOF''\n新增人生节点回顾模式\n\n添加日记/回顾双模式切换功能，支持按时间线查看所有生日和标记的人生节点，并可从回顾模式快速跳转到对应日期。\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\n新增人生节点回顾模式\n\n添加日记/回顾双模式切换功能，支持按时间线查看所有生日和标记的人生节点，并可从回顾模式快速跳转到对应日期。\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)",
+      "Bash(git restore:*)"
     ]
   }
 }

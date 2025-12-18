@@ -21,6 +21,44 @@
   transform: scale(0.95);
 }
 
+/* 主题切换按钮 */
+.btn-theme-toggle {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-divider);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-theme-toggle:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-tertiary);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.btn-theme-toggle:active {
+  transform: scale(0.95);
+}
+
+.theme-icon {
+  display: block;
+  line-height: 1;
+  transition: transform var(--transition-normal);
+}
+
+/* 主题切换动画 */
+.btn-theme-toggle:active .theme-icon {
+  transform: rotate(180deg);
+}
+
 /* 新建按钮 */
 .btn-new {
   width: 32px;
@@ -1564,4 +1602,702 @@
 .timeline-container--fade-in {
   opacity: 1 !important;
   transition: opacity 800ms ease;
+}
+
+/* ========================================
+   深色模式特殊样式调整
+   支持两种触发方式：
+   1. 系统自动：@media (prefers-color-scheme: dark)
+   2. 手动切换：[data-theme="dark"]
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  /* ========== 顶部导航栏 ========== */
+  .app-header {
+    background-color: rgba(15, 18, 20, 0.9);  /* 使用深色主背景 */
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* ========== 时间锚点 ========== */
+  .time-anchor {
+    background-color: rgba(15, 18, 20, 0.85);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+  }
+
+  /* 年份变化高亮时的调整 */
+  .time-anchor-year--highlight {
+    opacity: 0.9 !important;  /* 深色模式下不需要完全不透明 */
+  }
+
+  /* ========== 年份分隔符（水印需要更透明）========== */
+  .year-divider-number {
+    opacity: 0.04;  /* 从 0.1 降到 0.04 */
+    filter: blur(0.3px);  /* 微妙模糊，增强"时间模糊感" */
+  }
+
+  .year-divider:hover .year-divider-number {
+    opacity: 0.08;  /* hover 时也保持克制 */
+  }
+
+  /* ========== 按钮样式调整 ========== */
+  .btn-mode-toggle {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .btn-mode-toggle:hover {
+    border-color: rgba(255, 255, 255, 0.20);
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+
+  /* ========== 编辑器 ========== */
+  .editor-container {
+    background-color: var(--color-bg-elevated-2);  /* 使用二级抬升背景 */
+  }
+
+  .editor-header,
+  .editor-footer {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .editor-textarea {
+    background-color: var(--color-bg-elevated-2);
+    color: var(--color-text-primary);
+  }
+
+  .editor-textarea::placeholder {
+    color: var(--color-text-tertiary);
+    opacity: 0.5;
+  }
+
+  .editor-textarea:focus {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+
+  /* ========== 日期分组高亮背景 ========== */
+  .date-group--active {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  /* ========== 日期分割线（深色模式下虚线需要调整）========== */
+  .date-divider {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* ========== 上下文菜单 ========== */
+  .context-menu {
+    background-color: var(--color-bg-elevated-2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .context-menu-header {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .context-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .context-menu-item:active {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .context-menu-divider {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .context-menu-back {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .context-menu-back:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  /* 危险操作的深色适配 */
+  .context-menu-item--danger:hover {
+    background-color: rgba(211, 47, 47, 0.12);
+  }
+
+  /* ========== 空状态提示 ========== */
+  .empty-date-hint {
+    background-color: rgba(232, 224, 213, 0.15);  /* 使用暖色半透明 */
+    color: var(--color-text-primary);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ========== 回顾模式节点 ========== */
+  .review-node-spacer::before {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 20%,
+      rgba(255, 255, 255, 0.04) 80%,
+      transparent 100%
+    );
+  }
+
+  /* 回顾模式节点 hover 效果 */
+  .review-node:hover .review-node-content {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.04);
+  }
+
+  .review-node--active .review-node-content {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+  }
+
+  /* ========================================
+     生命日历深色模式优化
+     ======================================== */
+
+  /* 日历方块基础样式 - 使用亮色系统 */
+  .calendar-day {
+    background-color: rgba(255, 255, 255, 0.06);  /* 空白日子：微妙的亮方块 */
+  }
+
+  .calendar-day--empty {
+    background-color: transparent;
+    opacity: 0.4;
+  }
+
+  /* 有记录的日子 - 更亮 */
+  .calendar-day--recorded {
+    background-color: rgba(255, 255, 255, 0.20);
+  }
+
+  /* 今天 - 使用暖白色高亮 */
+  .calendar-day--today {
+    background-color: var(--color-text-primary);  /* 暖白色 */
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .calendar-day--today.calendar-day--recorded {
+    background-color: var(--color-text-primary);
+  }
+
+  /* Hover 效果 */
+  .calendar-day:hover:not(.calendar-day--empty) {
+    background-color: rgba(255, 255, 255, 0.30);
+  }
+
+  /* 当前阅读的日期高亮 */
+  .calendar-day--active {
+    background-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .calendar-day--active.calendar-day--recorded {
+    background-color: rgba(255, 255, 255, 0.40);
+  }
+
+  .calendar-day--today.calendar-day--active {
+    background-color: var(--color-text-primary);
+  }
+
+  /* 脉动动画调整 */
+  @keyframes calendarPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+  }
+
+  /* 年份分隔线 */
+  .calendar-year-divider::before {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  /* 月份第一天标记 */
+  .calendar-day--month-start::before {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+
+  /* 特殊日期 - 生日（靛青边框在深色下需要调整）*/
+  .calendar-day--birthday {
+    border-color: var(--color-birthday);
+    background-color: var(--color-birthday-bg) !important;
+  }
+
+  .calendar-day--birthday:hover {
+    border-color: #8db0d0;  /* hover 时更亮的靛青 */
+    background-color: rgba(122, 155, 184, 0.20) !important;
+    box-shadow: 0 0 0 1px rgba(122, 155, 184, 0.20);
+  }
+
+  .calendar-day--birthday.calendar-day--recorded {
+    background-color: rgba(122, 155, 184, 0.22) !important;
+  }
+
+  .calendar-day--birthday.calendar-day--today {
+    background-color: var(--color-text-primary) !important;
+    border-color: var(--color-birthday);
+    box-shadow: inset 0 0 0 1px rgba(122, 155, 184, 0.4);
+  }
+
+  /* 特殊日期 - 纪念日（暖棕边框）*/
+  .calendar-day--anniversary {
+    border-color: var(--color-anniversary);
+    background-color: var(--color-anniversary-bg) !important;
+  }
+
+  .calendar-day--anniversary:hover {
+    border-color: #cca97d;  /* hover 时更亮的暖棕 */
+    background-color: rgba(184, 148, 107, 0.18) !important;
+    box-shadow: 0 0 0 1px rgba(184, 148, 107, 0.15);
+  }
+
+  .calendar-day--anniversary.calendar-day--recorded {
+    background-color: rgba(184, 148, 107, 0.20) !important;
+  }
+
+  .calendar-day--anniversary.calendar-day--today {
+    background-color: var(--color-text-primary) !important;
+    border-color: var(--color-anniversary);
+    box-shadow: inset 0 0 0 1px rgba(184, 148, 107, 0.4);
+  }
+
+  /* 普通特殊日期圆点 */
+  .calendar-day--special::after {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .calendar-day--special:hover::after {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* 星期头部和周数标签 */
+  .calendar-weekday-header {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+  }
+
+  /* 回顾模式下的日历调整 */
+  .life-calendar--review-mode .calendar-day:not(.calendar-day--birthday):not(.calendar-day--anniversary) {
+    opacity: 0.08 !important;  /* 深色模式下稍微提高一点，避免完全消失 */
+  }
+}
+
+/* ========================================
+   手动切换到深色模式 [data-theme="dark"]
+   与上面媒体查询的样式完全一致
+   ======================================== */
+
+[data-theme="dark"] {
+  /* ========== 顶部导航栏 ========== */
+  .app-header {
+    background-color: rgba(15, 18, 20, 0.9);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* ========== 时间锚点 ========== */
+  .time-anchor {
+    background-color: rgba(15, 18, 20, 0.85);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .time-anchor-year--highlight {
+    opacity: 0.9 !important;
+  }
+
+  /* ========== 年份分隔符 ========== */
+  .year-divider-number {
+    opacity: 0.04;
+    filter: blur(0.3px);
+  }
+
+  .year-divider:hover .year-divider-number {
+    opacity: 0.08;
+  }
+
+  /* ========== 按钮样式调整 ========== */
+  .btn-mode-toggle,
+  .btn-theme-toggle {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .btn-mode-toggle:hover,
+  .btn-theme-toggle:hover {
+    border-color: rgba(255, 255, 255, 0.20);
+    background-color: rgba(255, 255, 255, 0.04);
+  }
+
+  /* ========== 编辑器 ========== */
+  .editor-container {
+    background-color: var(--color-bg-elevated-2);
+  }
+
+  .editor-header,
+  .editor-footer {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .editor-textarea {
+    background-color: var(--color-bg-elevated-2);
+    color: var(--color-text-primary);
+  }
+
+  .editor-textarea::placeholder {
+    color: var(--color-text-tertiary);
+    opacity: 0.5;
+  }
+
+  .editor-textarea:focus {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+
+  /* ========== 日期分组 ========== */
+  .date-group--active {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .date-divider {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* ========== 上下文菜单 ========== */
+  .context-menu {
+    background-color: var(--color-bg-elevated-2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .context-menu-header {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .context-menu-item:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .context-menu-item:active {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .context-menu-divider {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .context-menu-back {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .context-menu-back:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .context-menu-item--danger:hover {
+    background-color: rgba(211, 47, 47, 0.12);
+  }
+
+  /* ========== 空状态提示 ========== */
+  .empty-date-hint {
+    background-color: rgba(232, 224, 213, 0.15);
+    color: var(--color-text-primary);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ========== 回顾模式 ========== */
+  .review-node-spacer::before {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 20%,
+      rgba(255, 255, 255, 0.04) 80%,
+      transparent 100%
+    );
+  }
+
+  .review-node:hover .review-node-content {
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.04);
+  }
+
+  .review-node--active .review-node-content {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+  }
+
+  /* ========== 生命日历 ========== */
+  .calendar-day {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .calendar-day--empty {
+    background-color: transparent;
+    opacity: 0.4;
+  }
+
+  .calendar-day--recorded {
+    background-color: rgba(255, 255, 255, 0.20);
+  }
+
+  .calendar-day--today {
+    background-color: var(--color-text-primary);
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .calendar-day--today.calendar-day--recorded {
+    background-color: var(--color-text-primary);
+  }
+
+  .calendar-day:hover:not(.calendar-day--empty) {
+    background-color: rgba(255, 255, 255, 0.30);
+  }
+
+  .calendar-day--active {
+    background-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .calendar-day--active.calendar-day--recorded {
+    background-color: rgba(255, 255, 255, 0.40);
+  }
+
+  .calendar-day--today.calendar-day--active {
+    background-color: var(--color-text-primary);
+  }
+
+  @keyframes calendarPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+  }
+
+  .calendar-year-divider::before {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .calendar-day--month-start::before {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .calendar-day--birthday {
+    border-color: var(--color-birthday);
+    background-color: var(--color-birthday-bg) !important;
+  }
+
+  .calendar-day--birthday:hover {
+    border-color: #8db0d0;
+    background-color: rgba(122, 155, 184, 0.20) !important;
+    box-shadow: 0 0 0 1px rgba(122, 155, 184, 0.20);
+  }
+
+  .calendar-day--birthday.calendar-day--recorded {
+    background-color: rgba(122, 155, 184, 0.22) !important;
+  }
+
+  .calendar-day--birthday.calendar-day--today {
+    background-color: var(--color-text-primary) !important;
+    border-color: var(--color-birthday);
+    box-shadow: inset 0 0 0 1px rgba(122, 155, 184, 0.4);
+  }
+
+  .calendar-day--anniversary {
+    border-color: var(--color-anniversary);
+    background-color: var(--color-anniversary-bg) !important;
+  }
+
+  .calendar-day--anniversary:hover {
+    border-color: #cca97d;
+    background-color: rgba(184, 148, 107, 0.18) !important;
+    box-shadow: 0 0 0 1px rgba(184, 148, 107, 0.15);
+  }
+
+  .calendar-day--anniversary.calendar-day--recorded {
+    background-color: rgba(184, 148, 107, 0.20) !important;
+  }
+
+  .calendar-day--anniversary.calendar-day--today {
+    background-color: var(--color-text-primary) !important;
+    border-color: var(--color-anniversary);
+    box-shadow: inset 0 0 0 1px rgba(184, 148, 107, 0.4);
+  }
+
+  .calendar-day--special::after {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .calendar-day--special:hover::after {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+
+  .calendar-weekday-header {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .life-calendar--review-mode .calendar-day:not(.calendar-day--birthday):not(.calendar-day--anniversary) {
+    opacity: 0.08 !important;
+  }
+}
+
+/* ========================================
+   手动切换到浅色模式 [data-theme="light"]
+   显式定义浅色样式，确保从深色切换回来时正确显示
+   ======================================== */
+
+[data-theme="light"] {
+  /* ========== 顶部导航栏 ========== */
+  .app-header {
+    background-color: rgba(250, 250, 250, 0.9);
+    border-bottom-color: var(--color-divider);
+  }
+
+  /* ========== 时间锚点 ========== */
+  .time-anchor {
+    background-color: rgba(250, 250, 250, 0.85);
+    border-bottom-color: rgba(232, 232, 232, 0.4);
+  }
+
+  /* ========== 按钮样式 ========== */
+  .btn-mode-toggle,
+  .btn-theme-toggle {
+    border-color: var(--color-divider) !important;
+  }
+
+  .btn-mode-toggle:hover,
+  .btn-theme-toggle:hover {
+    border-color: var(--color-text-tertiary) !important;
+    background-color: rgba(0, 0, 0, 0.02) !important;
+  }
+
+  /* ========== 编辑器 ========== */
+  .editor-container {
+    background-color: #ffffff !important;
+  }
+
+  .editor-header,
+  .editor-footer {
+    border-color: var(--color-divider) !important;
+  }
+
+  .editor-textarea {
+    background-color: #ffffff !important;
+    color: var(--color-text-primary) !important;
+  }
+
+  /* ========== 确保年份水印使用浅色模式的透明度 ========== */
+  .year-divider-number {
+    opacity: 0.1 !important;
+    filter: none !important;
+  }
+
+  .year-divider:hover .year-divider-number {
+    opacity: 0.2 !important;
+  }
+
+  /* ========== 生命日历浅色模式 ========== */
+  .calendar-day {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+    opacity: 0.85 !important;
+  }
+
+  .calendar-day--empty {
+    background-color: transparent !important;
+    opacity: 0.3 !important;
+  }
+
+  .calendar-day--current-month {
+    opacity: 1 !important;
+  }
+
+  .calendar-day--recorded {
+    background-color: rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .calendar-day--today {
+    background-color: var(--color-text-primary) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .calendar-day--today.calendar-day--recorded {
+    background-color: var(--color-text-primary) !important;
+  }
+
+  .calendar-day:hover:not(.calendar-day--empty) {
+    background-color: rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .calendar-day--active {
+    background-color: rgba(0, 0, 0, 0.30) !important;
+  }
+
+  .calendar-day--active.calendar-day--recorded {
+    background-color: rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .calendar-day--today.calendar-day--active {
+    background-color: var(--color-text-primary) !important;
+  }
+
+  .calendar-day--month-start::before {
+    background-color: rgba(0, 0, 0, 0.20) !important;
+  }
+
+  .calendar-day--birthday {
+    border-color: var(--color-birthday) !important;
+    background-color: var(--color-birthday-bg) !important;
+  }
+
+  .calendar-day--birthday:hover {
+    border-color: rgba(47, 79, 108, 0.9) !important;
+    background-color: rgba(47, 79, 108, 0.18) !important;
+    box-shadow: 0 0 0 1px rgba(47, 79, 108, 0.15) !important;
+  }
+
+  .calendar-day--birthday.calendar-day--recorded {
+    background-color: rgba(47, 79, 108, 0.20) !important;
+  }
+
+  .calendar-day--birthday.calendar-day--today {
+    background-color: var(--color-text-primary) !important;
+    border-color: var(--color-birthday) !important;
+    box-shadow: inset 0 0 0 1px rgba(47, 79, 108, 0.3) !important;
+  }
+
+  .calendar-day--anniversary {
+    border-color: var(--color-anniversary) !important;
+    background-color: var(--color-anniversary-bg) !important;
+  }
+
+  .calendar-day--anniversary:hover {
+    border-color: rgba(139, 99, 56, 0.85) !important;
+    background-color: rgba(139, 99, 56, 0.14) !important;
+    box-shadow: 0 0 0 1px rgba(139, 99, 56, 0.12) !important;
+  }
+
+  .calendar-day--anniversary.calendar-day--recorded {
+    background-color: rgba(139, 99, 56, 0.16) !important;
+  }
+
+  .calendar-day--anniversary.calendar-day--today {
+    background-color: var(--color-text-primary) !important;
+    border-color: var(--color-anniversary) !important;
+    box-shadow: inset 0 0 0 1px rgba(139, 99, 56, 0.3) !important;
+  }
+
+  .calendar-day--special::after {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .calendar-day--special:hover::after {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .calendar-year-divider::before {
+    background: rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .calendar-weekday-header {
+    border-bottom-color: rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .life-calendar--review-mode .calendar-day:not(.calendar-day--birthday):not(.calendar-day--anniversary) {
+    opacity: 0.05 !important;
+  }
 }

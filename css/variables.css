@@ -77,3 +77,195 @@
   --color-birthday: rgba(47, 79, 108, 0.7);         /* 生日：靛青色（深蓝）*/
   --color-birthday-bg: rgba(47, 79, 108, 0.12);     /* 生日背景 */
 }
+
+/* ========================================
+   深色模式 - "夜间书房"配色系统
+   核心理念：
+   1. 背景带蓝调（模拟月光），文字带暖调（模拟烛光）
+   2. 极低对比度，主文字不超过 92% 灰
+   3. 靠明度差建立层级，而非边框和阴影
+   4. 留白加大 10-15%，给"光晕"留空间
+
+   支持两种方式触发：
+   1. 系统自动：@media (prefers-color-scheme: dark)
+   2. 手动切换：[data-theme="dark"]
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]),
+  :root[data-theme="auto"] {
+    /* ========== 背景层级（冷色调，模拟夜空/月光）========== */
+    --color-bg-primary: #0f1214;        /* 主背景：略带蓝的深灰（模拟深夜）*/
+    --color-bg-elevated-1: #181c20;     /* 一级抬升：时间轴内容区 */
+    --color-bg-elevated-2: #242629;     /* 二级抬升：编辑器背景 */
+    --color-bg-overlay: rgba(0, 0, 0, 0.85); /* 遮罩层：更深，增强聚焦感 */
+
+    /* ========== 文字层级（暖色调，模拟烛光/台灯）========== */
+    --color-text-primary: #e8e0d5;      /* 主文字：略带米色的白（92% 亮度）*/
+    --color-text-secondary: #a89f91;    /* 次要文字：暖灰（时间戳）*/
+    --color-text-tertiary: #6e6860;     /* 三级文字：深暖灰（日期标签）*/
+    --color-text-ghost: #484440;        /* 幽灵文字：年份水印等装饰性元素 */
+
+    /* ========== 分割线（极淡的亮线）========== */
+    --color-divider: rgba(255, 255, 255, 0.08);
+
+    /* ========== 特殊日期（提亮+调整饱和度，像烛光点缀）========== */
+    --color-anniversary: #b8946b;                   /* 暖棕（琥珀）- 提亮 */
+    --color-anniversary-bg: rgba(184, 148, 107, 0.10);
+    --color-birthday: #7a9bb8;                      /* 靛青 - 提亮 */
+    --color-birthday-bg: rgba(122, 155, 184, 0.12);
+
+    /* ========== 时间线系统 ========== */
+    --timeline-color: rgba(255, 255, 255, 0.06);   /* 更淡的时间线 */
+
+    /* ========== 交互状态 ========== */
+    --hover-bg: rgba(255, 255, 255, 0.04);         /* 微妙的亮化 */
+
+    /* ========== 内容颜色（基于长度）- 深色模式统一处理 ========== */
+    --content-color-short: #d8d0c5;     /* 短句：稍淡一点 */
+    --content-color-normal: #e8e0d5;    /* 标准：主文字色 */
+
+    /* ========== 排版调整（深色模式需要更多呼吸空间）========== */
+    --font-size-content: 15px;          /* 从 16px 缩小（深色文字视觉重量更大）*/
+    --font-size-date-number: 20px;      /* 从 22px 缩小 */
+    --line-height-content: 1.8;         /* 从 1.7 增加（给光晕留空间）*/
+    --line-height-short: 1.7;           /* 从 1.6 增加 */
+    --line-height-normal: 1.8;          /* 从 1.7 增加 */
+
+    /* ========== 间距增加（深色背景下需要更夸张的留白）========== */
+    --spacing-2xl: 72px;                /* 从 64px 增加 */
+    --spacing-3xl: 88px;                /* 从 80px 增加 */
+    --spacing-4xl: 132px;               /* 从 120px 增加 */
+    --spacing-5xl: 176px;               /* 从 160px 增加 */
+
+    /* ========== 动画速度（深色模式下慢一点更舒缓）========== */
+    --transition-normal: 400ms ease;    /* 从 300ms 延长 */
+    --transition-slow: 500ms ease-out;  /* 从 400ms 延长 */
+
+    /* ========== 透明度调整 ========== */
+    --time-opacity-today: 0.90;         /* 略微提高 */
+    --time-opacity-recent: 0.75;        /* 略微提高 */
+    --time-opacity-old: 0.60;           /* 略微提高（深色下过淡会看不清）*/
+    --time-opacity-hover: 1.0;
+
+    --date-opacity-default: 0.70;       /* 从 0.65 提高 */
+    --date-opacity-hover: 0.90;         /* 从 0.85 提高 */
+  }
+}
+
+/* 手动切换到深色模式 */
+:root[data-theme="dark"] {
+  /* ========== 背景层级（冷色调，模拟夜空/月光）========== */
+  --color-bg-primary: #0f1214;        /* 主背景：略带蓝的深灰（模拟深夜）*/
+  --color-bg-elevated-1: #181c20;     /* 一级抬升：时间轴内容区 */
+  --color-bg-elevated-2: #242629;     /* 二级抬升：编辑器背景 */
+  --color-bg-overlay: rgba(0, 0, 0, 0.85); /* 遮罩层：更深，增强聚焦感 */
+
+  /* ========== 文字层级（暖色调，模拟烛光/台灯）========== */
+  --color-text-primary: #e8e0d5;      /* 主文字：略带米色的白（92% 亮度）*/
+  --color-text-secondary: #a89f91;    /* 次要文字：暖灰（时间戳）*/
+  --color-text-tertiary: #6e6860;     /* 三级文字：深暖灰（日期标签）*/
+  --color-text-ghost: #484440;        /* 幽灵文字：年份水印等装饰性元素 */
+
+  /* ========== 分割线（极淡的亮线）========== */
+  --color-divider: rgba(255, 255, 255, 0.08);
+
+  /* ========== 特殊日期（提亮+调整饱和度，像烛光点缀）========== */
+  --color-anniversary: #b8946b;                   /* 暖棕（琥珀）- 提亮 */
+  --color-anniversary-bg: rgba(184, 148, 107, 0.10);
+  --color-birthday: #7a9bb8;                      /* 靛青 - 提亮 */
+  --color-birthday-bg: rgba(122, 155, 184, 0.12);
+
+  /* ========== 时间线系统 ========== */
+  --timeline-color: rgba(255, 255, 255, 0.06);   /* 更淡的时间线 */
+
+  /* ========== 交互状态 ========== */
+  --hover-bg: rgba(255, 255, 255, 0.04);         /* 微妙的亮化 */
+
+  /* ========== 内容颜色（基于长度）- 深色模式统一处理 ========== */
+  --content-color-short: #d8d0c5;     /* 短句：稍淡一点 */
+  --content-color-normal: #e8e0d5;    /* 标准：主文字色 */
+
+  /* ========== 排版调整（深色模式需要更多呼吸空间）========== */
+  --font-size-content: 15px;          /* 从 16px 缩小（深色文字视觉重量更大）*/
+  --font-size-date-number: 20px;      /* 从 22px 缩小 */
+  --line-height-content: 1.8;         /* 从 1.7 增加（给光晕留空间）*/
+  --line-height-short: 1.7;           /* 从 1.6 增加 */
+  --line-height-normal: 1.8;          /* 从 1.7 增加 */
+
+  /* ========== 间距增加（深色背景下需要更夸张的留白）========== */
+  --spacing-2xl: 72px;                /* 从 64px 增加 */
+  --spacing-3xl: 88px;                /* 从 80px 增加 */
+  --spacing-4xl: 132px;               /* 从 120px 增加 */
+  --spacing-5xl: 176px;               /* 从 160px 增加 */
+
+  /* ========== 动画速度（深色模式下慢一点更舒缓）========== */
+  --transition-normal: 400ms ease;    /* 从 300ms 延长 */
+  --transition-slow: 500ms ease-out;  /* 从 400ms 延长 */
+
+  /* ========== 透明度调整 ========== */
+  --time-opacity-today: 0.90;         /* 略微提高 */
+  --time-opacity-recent: 0.75;        /* 略微提高 */
+  --time-opacity-old: 0.60;           /* 略微提高（深色下过淡会看不清）*/
+  --time-opacity-hover: 1.0;
+
+  --date-opacity-default: 0.70;       /* 从 0.65 提高 */
+  --date-opacity-hover: 0.90;         /* 从 0.85 提高 */
+}
+
+/* ========================================
+   手动切换到浅色模式 [data-theme="light"]
+   显式定义浅色模式的变量，确保从深色切换回来时正确重置
+   ======================================== */
+
+:root[data-theme="light"] {
+  /* ========== 恢复浅色模式的默认值 ========== */
+  --color-bg-primary: #fafafa;
+  --color-bg-elevated-1: #ffffff;
+  --color-bg-elevated-2: #ffffff;
+  --color-bg-overlay: rgba(0, 0, 0, 0.4);
+
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #aaaaaa;
+
+  --color-divider: #e8e8e8;
+
+  --color-anniversary: rgba(139, 99, 56, 0.6);
+  --color-anniversary-bg: rgba(139, 99, 56, 0.08);
+  --color-birthday: rgba(47, 79, 108, 0.7);
+  --color-birthday-bg: rgba(47, 79, 108, 0.12);
+
+  --timeline-color: rgba(0, 0, 0, 0.08);
+
+  --hover-bg: rgba(0, 0, 0, 0.02);
+
+  --content-color-short: #333333;
+  --content-color-normal: #1a1a1a;
+
+  /* 恢复浅色模式的排版 */
+  --font-size-content: 16px;
+  --font-size-date-number: 22px;
+  --line-height-content: 1.7;
+  --line-height-short: 1.6;
+  --line-height-normal: 1.7;
+
+  /* 恢复浅色模式的间距 */
+  --spacing-2xl: 64px;
+  --spacing-3xl: 80px;
+  --spacing-4xl: 120px;
+  --spacing-5xl: 160px;
+
+  /* 恢复浅色模式的动画速度 */
+  --transition-normal: 300ms ease;
+  --transition-slow: 400ms ease-out;
+
+  /* 恢复浅色模式的透明度 */
+  --time-opacity-today: 0.85;
+  --time-opacity-recent: 0.70;
+  --time-opacity-old: 0.55;
+  --time-opacity-hover: 1.0;
+
+  --date-opacity-default: 0.65;
+  --date-opacity-hover: 0.85;
+}

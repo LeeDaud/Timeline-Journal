@@ -4,7 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="极简时间轴日记">
-  <title>日记</title>
+  <title>日迹</title>
+
+  <!-- Favicon 图标 -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#0f1214">
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/reset.css">
@@ -17,10 +25,10 @@
   <!-- 顶部导航栏 -->
   <header class="app-header">
     <div class="header-container">
-      <h1 class="app-title">日记</h1>
+      <h1 class="app-title">日迹</h1>
       <div class="header-actions">
         <button class="btn-mode-toggle" id="btnModeToggle" aria-label="切换模式">
-          <span class="mode-toggle-text" data-diary="日记" data-review="回顾">日记</span>
+          <span class="mode-toggle-text" data-diary="日迹" data-review="回顾">日迹</span>
         </button>
         <button class="btn-theme-toggle" id="btnThemeToggle" aria-label="切换主题" title="切换日间/夜间模式">
           <span class="theme-text">自动</span>
@@ -36,10 +44,11 @@
       <div class="time-anchor-year">2024</div>
       <div class="time-anchor-primary">
         <span class="time-anchor-month">12</span>
-        <span class="time-anchor-separator">/</span>
+        <span class="time-anchor-separator">月</span>
         <span class="time-anchor-day">16</span>
+        <span class="time-anchor-separator">日</span>
       </div>
-      <div class="time-anchor-weekday">Mon</div>
+      <div class="time-anchor-weekday">周一</div>
     </div>
   </div>
 
@@ -72,23 +81,29 @@
     <div class="timeline-wrapper">
       <div class="timeline-container" id="timelineContainer">
 
-        <!-- 🆕 写作入口 - 安静的书写空间 -->
+        <!-- 写作入口 - 简洁的书写空间 -->
         <div class="writing-entry" id="writingEntry">
           <textarea
             class="writing-entry-input"
             id="writingEntryInput"
-            placeholder="记录你此刻的想法…"
-            rows="1"
-            data-min-rows="1"
+            placeholder="记录此刻…"
+            rows="3"
+            data-min-rows="3"
             data-max-rows="12"
           ></textarea>
 
-          <!-- 提交按钮（默认隐藏，聚焦后显示）-->
-          <button class="writing-entry-submit" id="writingEntrySubmit" aria-label="提交">
-            <svg class="submit-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor"/>
-            </svg>
-          </button>
+          <!-- 底部栏：时间 + 提交按钮 -->
+          <div class="writing-entry-footer">
+            <span class="writing-entry-time" id="writingEntryTime">--:--</span>
+            <button class="writing-entry-submit" id="writingEntrySubmit" aria-label="保存">
+              <!-- 自定义图标：assets/icons/icon.svg -->
+              <img class="submit-icon-custom" src="assets/icons/icon.svg" alt="保存" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+              <!-- 备用图标（当自定义图标加载失败时显示）-->
+              <svg class="submit-icon-fallback" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+                <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <!-- 时间轴内容 -->

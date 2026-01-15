@@ -1,102 +1,116 @@
-# 时间轴日记 - Timeline Diary
+# 日迹 - Timeline Journal
 
-极简风格的 Web 日记应用，灵感来源于「极简日记」App。
+> 一款极简风格的时间轴日记应用，专注于记录生命中的每一刻。
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-green.svg)
+
+## 预览
+
+<!-- 添加你的截图 -->
+<!-- ![日迹预览](screenshots/preview.png) -->
 
 ## 设计理念
 
-- **时间作为唯一主线** - 以时间轴组织所有记录
-- **内容即界面** - UI 元素极度克制，内容为主
-- **呼吸感留白** - 大量负空间，让思绪有停留的余地
-- **连续性 > 完整性** - 降低记录门槛，强调生活的连续性
-- **纯粹的私密空间** - 无社交元素，与自己对话的场所
+- **时间作为唯一主线** — 以时间轴组织所有记录，让生命的痕迹清晰可见
+- **内容即界面** — UI 元素极度克制，内容为主角
+- **呼吸感留白** — 大量负空间，让思绪有停留的余地
+- **长期耐看** — 深色「夜间书房」配色，适合 5-10 年长期使用
+- **纯粹的私密空间** — 无社交元素，与自己对话的场所
 
 ## 功能特点
 
-- 📝 **全历史时间轴** - 所有记录统一在一条纵向时间轴上
-- 📅 **智能日期分组** - 自动按日期分割，最新记录在上方
-- ⏱️ **精确到分钟** - 每条记录显示具体时间（14:32）
-- 💾 **本地存储** - 数据保存在浏览器 LocalStorage
-- 🎯 **极简交互** - 点击记录编辑，Esc 关闭，Ctrl+S 保存
-- 📱 **响应式设计** - 支持桌面和移动端
+### 核心功能
+- 📝 **时间轴日记** — 所有记录统一在一条纵向时间轴上，最新在上
+- 📅 **智能日期分组** — 自动按日期分割，年/月/日层级清晰
+- ⏱️ **精确时间戳** — 每条记录显示具体时间，书写时实时显示当前时刻
+- 🌓 **日间/夜间模式** — 支持自动跟随系统、手动切换
+- 💾 **本地存储** — 数据保存在浏览器 LocalStorage，隐私安全
+
+### 生命日历
+- 🗓️ **人生格子** — 左侧生命日历，一格一天，可视化生命进度
+- 🎂 **生日标记** — 自动标记每年生日，计算周岁
+- 📍 **人生节点** — 支持标记重要纪念日和里程碑
+- 🔍 **回顾模式** — 一键切换，只显示生日和人生节点
+
+### 书写体验
+- ✨ **玻璃质感输入框** — 半透明毛玻璃效果，沉浸式书写
+- 🎯 **极简交互** — 点击记录编辑，Esc 关闭，Ctrl+S 保存
+- 📱 **响应式设计** — 完美适配桌面、平板、移动端
 
 ## 快速开始
 
-### 1. 直接打开使用
+### 在线使用
 
-用浏览器打开 `index.html` 即可使用。
+访问：`https://your-domain.com`
 
-### 2. 生成测试数据
+### 本地运行
 
-在浏览器控制台（F12）中执行以下代码：
-
-```javascript
-// 生成测试数据
-const testEntries = [
-  {
-    id: '1734451200000-x8k3m9',
-    content: '睡前想记录一下今天的感受。\n\n虽然有些疲惫，但心情是平静的。',
-    createdAt: 1734451200000,
-    updatedAt: 1734451200000,
-    deleted: false,
-    metadata: { wordCount: 30, device: 'web' }
-  },
-  {
-    id: '1734364920000-b4h7k2',
-    content: '下午去了一家新开的咖啡馆，环境很安静，适合看书。',
-    createdAt: 1734364920000,
-    updatedAt: 1734364920000,
-    deleted: false,
-    metadata: { wordCount: 26, device: 'web' }
-  },
-  {
-    id: '1734364800000-a3f2c1',
-    content: '今天天气很好，去公园散步了。\n\n看到很多人在放风筝，想起小时候的事。',
-    createdAt: 1734364800000,
-    updatedAt: 1734364800000,
-    deleted: false,
-    metadata: { wordCount: 40, device: 'web' }
-  }
-];
-
-const data = {
-  entries: testEntries,
-  settings: { theme: 'light', fontSize: 'medium', lastSyncAt: null },
-  version: '1.0.0'
-};
-
-localStorage.setItem('diary_data', JSON.stringify(data));
-location.reload();
+1. 克隆仓库
+```bash
+git clone https://github.com/your-username/timeline-journal.git
+cd timeline-journal
 ```
 
-### 3. 快捷键
+2. 用浏览器打开 `index.html` 即可使用
 
-- **Esc** - 关闭编辑器
-- **Ctrl+S** / **Cmd+S** - 保存记录
+> 无需安装任何依赖，纯静态页面
+
+### 部署到服务器
+
+将以下文件上传到服务器根目录：
+
+```
+├── index.html
+├── site.webmanifest
+├── favicon.ico
+├── favicon-16x16.png
+├── favicon-32x32.png
+├── apple-touch-icon.png
+├── android-chrome-192x192.png
+├── android-chrome-512x512.png
+├── css/
+├── js/
+└── assets/
+```
+
+## 快捷键
+
+| 快捷键 | 功能 |
+|--------|------|
+| `Esc` | 关闭编辑器 |
+| `Ctrl+S` / `Cmd+S` | 保存记录 |
+| `Ctrl+Enter` / `Cmd+Enter` | 快速提交新记录 |
 
 ## 项目结构
 
 ```
-timeline-diary/
+timeline-journal/
 ├── index.html              # 应用入口
+├── site.webmanifest        # PWA 配置
 ├── css/
-│   ├── reset.css          # CSS 重置
-│   ├── variables.css      # 设计变量
-│   ├── layout.css         # 布局结构
-│   └── components.css     # 组件样式
+│   ├── reset.css           # CSS 重置
+│   ├── variables.css       # 设计变量（颜色、间距、字号）
+│   ├── layout.css          # 布局结构
+│   └── components.css      # 组件样式
 ├── js/
-│   ├── storage.js         # 数据存储层
-│   ├── models.js          # 数据模型
-│   ├── ui.js              # UI 渲染
-│   └── app.js             # 应用逻辑
-└── README.md
+│   ├── app.js              # 应用主逻辑
+│   ├── ui.js               # UI 渲染
+│   ├── models.js           # 数据模型
+│   ├── storage.js          # 本地存储
+│   ├── theme.js            # 主题切换
+│   └── writing-entry.js    # 写作入口组件
+└── assets/
+    └── icons/
+        └── icon.svg        # 自定义保存图标
 ```
 
 ## 技术栈
 
-- **HTML5** - 语义化标签
-- **CSS3** - CSS 变量 + Flexbox
-- **原生 JavaScript** - 模块化设计（IIFE）
-- **LocalStorage** - 本地数据持久化
+- **HTML5** — 语义化标签
+- **CSS3** — CSS 变量 + Flexbox + Grid + backdrop-filter
+- **原生 JavaScript** — 模块化设计（IIFE），零依赖
+- **LocalStorage** — 本地数据持久化
 
 ## 数据结构
 
@@ -109,6 +123,7 @@ timeline-diary/
   "createdAt": 1734364800000,
   "updatedAt": 1734364800000,
   "deleted": false,
+  "weather": "sunny",
   "metadata": {
     "wordCount": 23,
     "device": "web"
@@ -116,33 +131,43 @@ timeline-diary/
 }
 ```
 
-### LocalStorage 结构
+### 本地存储结构
 
 ```json
 {
   "entries": [...],
   "settings": {
-    "theme": "light",
-    "fontSize": "medium",
-    "lastSyncAt": null
+    "theme": "auto",
+    "birthDate": "1990-01-01"
   },
-  "version": "1.0.0"
+  "milestones": [
+    {
+      "date": "2020-06-01",
+      "label": "毕业",
+      "type": "major_milestone"
+    }
+  ],
+  "version": "2.0.0"
 }
 ```
 
 ## 浏览器兼容性
 
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+| 浏览器 | 最低版本 |
+|--------|----------|
+| Chrome | 90+ |
+| Firefox | 88+ |
+| Safari | 14+ |
+| Edge | 90+ |
+
+> 需要支持 `backdrop-filter` 以获得最佳玻璃质感效果
 
 ## 开发调试
 
 ### 查看存储数据
 
 ```javascript
-// 查看 LocalStorage 中的数据
+// 查看所有数据
 console.log(DiaryStorage.loadData());
 
 // 查看时间轴结构
@@ -158,20 +183,36 @@ localStorage.removeItem('diary_data');
 location.reload();
 ```
 
-## 未来扩展
+### 设置出生日期
 
+```javascript
+DiaryStorage.setBirthDate('1990-01-01');
+location.reload();
+```
+
+## 路线图
+
+- [x] 时间轴日记
+- [x] 生命日历
+- [x] 日间/夜间模式
+- [x] 回顾模式
+- [x] 天气标记
+- [x] 玻璃质感 UI
 - [ ] 全文搜索
 - [ ] 标签功能
-- [ ] 导出 Markdown
+- [ ] 导出 Markdown / JSON
 - [ ] 云端同步
 - [ ] 数据统计
-- [ ] 主题切换
 
 ## 许可证
 
-MIT
+本项目基于 [MIT 许可证](LICENSE) 开源。
+
+## 致谢
+
+- 设计灵感：极简日记 App
+- 配色参考：夜间书房概念
 
 ---
 
-**设计与开发**：基于极简主义设计哲学
-**灵感来源**：极简日记 App
+**用时间记录生命，用日迹见证成长。**

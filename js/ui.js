@@ -67,7 +67,7 @@ const DiaryUI = (function() {
   function parseDateForDisplay(dateKey) {
     const [year, month, day] = dateKey.split('-').map(Number);
     const date = new Date(year, month - 1, day);
-    const weekdays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
     return {
       year: year,
@@ -127,7 +127,7 @@ const DiaryUI = (function() {
             <div class="${labelClass}">
               <span class="date-year">${dateParts.year}</span>
               <span class="date-month-day">
-                ${dateParts.month}<span class="date-separator">/</span>${dateParts.day}
+                ${dateParts.month}<span class="date-separator">月</span>${dateParts.day}<span class="date-separator date-separator--day">日</span>
               </span>
               <span class="date-weekday">${dateParts.weekday}</span>
             </div>
@@ -577,6 +577,9 @@ const DiaryUI = (function() {
   function generateWeekRowHTML(week) {
     const weekNumber = week.weekNumber;
 
+    // 检查这一周是否包含今天
+    const isCurrentWeek = week.days.some(day => day.isToday);
+
     const daysHTML = week.days.map(day => {
       if (day.isEmpty) {
         // 未来的日期或空白方块
@@ -639,8 +642,14 @@ const DiaryUI = (function() {
                    title="${tooltipText}"></div>`;
     }).join('');
 
+    // 周行 class：如果是当前周则添加高亮
+    const weekRowClasses = ['calendar-week-row'];
+    if (isCurrentWeek) {
+      weekRowClasses.push('calendar-week-row--current');
+    }
+
     return `
-      <div class="calendar-week-row" data-week="${weekNumber}">
+      <div class="${weekRowClasses.join(' ')}" data-week="${weekNumber}">
         <div class="week-number">${weekNumber}</div>
         ${daysHTML}
       </div>

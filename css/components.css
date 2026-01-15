@@ -98,10 +98,10 @@
 }
 
 .year-divider-number {
-  font-size: 80px;
+  font-size: 100px;  /* 从 80px 提升到 100px */
   font-weight: 100;  /* 极细字体，降低存在感 */
   color: var(--color-text-primary);
-  opacity: 0.1;  /* 极淡，若隐若现的时间水印 */
+  opacity: 0.08;  /* 从 0.1 调整到 0.08，更克制 */
   letter-spacing: 8px;
   user-select: none;
   pointer-events: none;
@@ -120,14 +120,14 @@
     transform: translateY(10px);
   }
   to {
-    opacity: 0.1;
+    opacity: 0.08;
     transform: translateY(0);
   }
 }
 
 /* 可选：hover 时微微浮现 */
 .year-divider:hover .year-divider-number {
-  opacity: 0.2;
+  opacity: 0.15;
   transition: opacity 600ms ease;
 }
 
@@ -139,7 +139,7 @@
   }
 
   .year-divider-number {
-    font-size: 60px;
+    font-size: 72px;  /* 从 60px 提升到 72px */
     letter-spacing: 4px;
   }
 }
@@ -268,37 +268,43 @@
   line-height: 1;
 }
 
-/* 年份 - 前缀，极弱 */
+/* 年份 - 前缀，极弱（进一步弱化）*/
 .date-year {
   font-size: 10px;
   font-weight: 400;
-  opacity: 0.4;
+  opacity: 0.25;  /* 从 0.4 降到 0.25，几乎隐形 */
   letter-spacing: 0.5px;
 }
 
-/* 月/日 - 主视觉 */
+/* 月/日 - 主视觉（增强）*/
 .date-month-day {
   font-size: var(--font-size-date-number);  /* 22px */
   font-weight: 300;
-  letter-spacing: -0.5px;
+  letter-spacing: 0;
   line-height: 1;
+  opacity: 1;  /* 完全显示 */
 }
 
-/* 斜杠分隔符 */
+/* 分隔符（月、日字）*/
 .date-separator {
-  font-size: 16px;
-  opacity: 0.3;
-  margin: 0 -2px;
+  font-size: 12px;
+  font-weight: 400;
+  opacity: 0.5;
+  margin: 0 1px;
 }
 
-/* 星期 - 辅助信息 */
+/* "日"字后面需要更多间距 */
+.date-separator--day {
+  margin-right: 6px;
+}
+
+/* 星期 - 辅助信息（略强于年份）*/
 .date-weekday {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
-  opacity: 0.4;
-  text-transform: uppercase;
+  opacity: 0.50;
   letter-spacing: 0.5px;
-  margin-left: 4px;
+  margin-left: 2px;
 }
 
 /* 🆕 生日标签：最大 + 靛青色（系统级）*/
@@ -320,12 +326,12 @@
 }
 
 /* ========================================
-   天气选择器
+   天气选择器 - 增强对比度
    ======================================== */
 
 .weather-selector {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   padding: 0;
   border: none;
   background: transparent;
@@ -333,38 +339,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.25;  /* 默认极淡 */
+  opacity: 0.35;  /* 从 0.25 提升到 0.35 */
   transition: opacity var(--transition-normal),
               transform var(--transition-fast);
   flex-shrink: 0;
 }
 
 .weather-selector:hover {
-  opacity: 0.5;  /* hover 时略微增强 */
+  opacity: 0.65;  /* 从 0.5 提升到 0.65 */
   transform: scale(1.1);
 }
 
-/* 有天气时稍微增强存在感 */
+/* 有天气时增强存在感 */
 .weather-selector[data-weather]:not([data-weather=""]) {
-  opacity: 0.35;
+  opacity: 0.50;  /* 从 0.35 提升到 0.50 */
 }
 
 .weather-selector[data-weather]:not([data-weather=""]):hover {
-  opacity: 0.6;
+  opacity: 0.75;  /* 从 0.6 提升到 0.75 */
 }
 
 /* 天气图标 */
 .weather-icon {
   width: 100%;
   height: 100%;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);  /* 使用次要文字色，提升对比度 */
 }
 
-/* 空状态：显示一个极淡的圆点（暗示可点击）*/
+/* 空状态：显示一个圆点（暗示可点击）*/
 .weather-selector[data-weather=""]::before {
   content: '';
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background-color: currentColor;
   display: block;
@@ -407,7 +413,7 @@
 .entry-item::before {
   content: '';
   position: absolute;
-  left: var(--timeline-offset);      /* 68px，在时间戳右侧 */
+  left: var(--timeline-offset);      /* 64px，在时间戳右侧 */
   top: 0;
   bottom: 0;
   width: var(--timeline-width);      /* 1px */
@@ -415,23 +421,23 @@
   pointer-events: none;
 }
 
-/* 时间节点圆点 */
+/* 时间节点圆点 - 增强存在感 */
 .entry-item::after {
   content: '';
   position: absolute;
-  left: calc(var(--timeline-offset) - 2px);  /* 居中对齐时间线 */
+  left: calc(var(--timeline-offset) - 2.5px);  /* 居中对齐时间线 */
   top: 20px;                         /* 对齐时间戳位置 */
-  width: 5px;
-  height: 5px;
+  width: 6px;                        /* 从 5px 增加到 6px */
+  height: 6px;
   border-radius: 50%;
   background: var(--color-text-secondary);
-  opacity: 0.25;
+  opacity: 0.35;                     /* 从 0.25 增加到 0.35 */
   transition: all var(--transition-normal);
   pointer-events: none;
 }
 
 .entry-item:hover::after {
-  opacity: 0.5;
+  opacity: 0.55;
   transform: scale(1.2);
 }
 
@@ -445,9 +451,9 @@
   margin-bottom: 16px;
 }
 
-/* 时间戳 - 增强存在感 */
+/* 时间戳 - 收窄宽度 */
 .entry-time {
-  width: 56px;                       /* 从 48px 增加到 56px */
+  width: 52px;                       /* 从 56px 收窄到 52px */
   flex-shrink: 0;
   font-size: var(--font-size-time);  /* 12px，已在变量中增强 */
   font-weight: 500;                  /* 增加字重 */
@@ -465,11 +471,11 @@
   opacity: var(--time-opacity-hover);
 }
 
-/* 正文内容 - 降低视觉权重，让时间成为主叙事 */
+/* 正文内容 - 收窄间距 */
 .entry-content {
   flex: 1;
-  margin-left: 24px;                 /* 增加与时间戳的间距 */
-  padding-left: 32px;                /* 为时间线留出空间 */
+  margin-left: 20px;                 /* 从 24px 收窄到 20px */
+  padding-left: 28px;                /* 从 32px 收窄到 28px */
   font-size: var(--font-size-content);  /* 16px，已降低 */
   line-height: var(--line-height-normal);
   color: var(--content-color-normal);
@@ -687,7 +693,7 @@
   font-size: 28px;
   font-weight: 300;
   color: var(--color-text-primary);
-  letter-spacing: -0.5px;
+  letter-spacing: 0;
   line-height: 1;
 }
 
@@ -697,19 +703,20 @@
 }
 
 .time-anchor-separator {
-  font-size: 20px;
-  opacity: 0.3;
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.4;
   margin: 0 2px;
 }
 
 /* 星期：辅助信息 */
 .time-anchor-weekday {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
   color: var(--color-text-secondary);
-  opacity: 0.5;
-  text-transform: uppercase;
+  opacity: 0.6;
   letter-spacing: 0.5px;
+  margin-left: 8px;
 }
 
 /* 移动端优化 */
@@ -972,6 +979,30 @@
   grid-template-columns: 28px repeat(7, 1fr);  /* 左侧周数 + 7天 */
   gap: 2px;
   align-items: center;
+}
+
+/* 当前周所在行 - 极轻的亮度提升 */
+.calendar-week-row--current {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 3px;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
+/* 浅色模式下当前行高亮 */
+:root:not([data-theme="dark"]) .calendar-week-row--current {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) .calendar-week-row--current,
+  :root[data-theme="auto"] .calendar-week-row--current {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+}
+
+[data-theme="light"] .calendar-week-row--current {
+  background-color: rgba(0, 0, 0, 0.02) !important;
 }
 
 /* 周数标签 */
@@ -1625,14 +1656,20 @@
     opacity: 0.9 !important;  /* 深色模式下不需要完全不透明 */
   }
 
-  /* ========== 年份分隔符（水印需要更透明）========== */
+  /* ========== 年份分隔符（水印需要更透明但可感知）========== */
   .year-divider-number {
-    opacity: 0.04;  /* 从 0.1 降到 0.04 */
+    opacity: 0.06;  /* 从 0.04 提升到 0.06，恢复时间节奏感 */
     filter: blur(0.3px);  /* 微妙模糊，增强"时间模糊感" */
   }
 
   .year-divider:hover .year-divider-number {
-    opacity: 0.08;  /* hover 时也保持克制 */
+    opacity: 0.10;  /* hover 时也保持克制 */
+  }
+
+  @keyframes yearFadeIn {
+    to {
+      opacity: 0.06;
+    }
   }
 
   /* ========== 按钮样式调整 ========== */
@@ -1672,6 +1709,27 @@
   /* ========== 日期分组高亮背景 ========== */
   .date-group--active {
     background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  /* ========== 天气选择器深色模式增强 ========== */
+  .weather-selector {
+    opacity: 0.45;  /* 深色模式下进一步提升 */
+  }
+
+  .weather-selector:hover {
+    opacity: 0.75;
+  }
+
+  .weather-selector[data-weather]:not([data-weather=""]) {
+    opacity: 0.60;
+  }
+
+  .weather-selector[data-weather]:not([data-weather=""]):hover {
+    opacity: 0.85;
+  }
+
+  .weather-icon {
+    color: var(--color-text-primary);  /* 深色模式使用主文字色 */
   }
 
   /* ========== 日期分割线（深色模式下虚线需要调整）========== */
@@ -1874,6 +1932,15 @@
   .life-calendar--review-mode .calendar-day:not(.calendar-day--birthday):not(.calendar-day--anniversary) {
     opacity: 0.08 !important;  /* 深色模式下稍微提高一点，避免完全消失 */
   }
+
+  /* ========== 时间线圆点深色模式增强 ========== */
+  .entry-item::after {
+    opacity: 0.40;  /* 从 0.35 提升到 0.40 */
+  }
+
+  .entry-item:hover::after {
+    opacity: 0.60;
+  }
 }
 
 /* ========================================
@@ -1900,12 +1967,18 @@
 
   /* ========== 年份分隔符 ========== */
   .year-divider-number {
-    opacity: 0.04;
+    opacity: 0.06;  /* 从 0.04 提升到 0.06 */
     filter: blur(0.3px);
   }
 
   .year-divider:hover .year-divider-number {
-    opacity: 0.08;
+    opacity: 0.10;
+  }
+
+  @keyframes yearFadeIn {
+    to {
+      opacity: 0.06;
+    }
   }
 
   /* ========== 按钮样式调整 ========== */
@@ -1947,6 +2020,27 @@
   /* ========== 日期分组 ========== */
   .date-group--active {
     background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  /* ========== 天气选择器深色模式增强 ========== */
+  .weather-selector {
+    opacity: 0.45;
+  }
+
+  .weather-selector:hover {
+    opacity: 0.75;
+  }
+
+  .weather-selector[data-weather]:not([data-weather=""]) {
+    opacity: 0.60;
+  }
+
+  .weather-selector[data-weather]:not([data-weather=""]):hover {
+    opacity: 0.85;
+  }
+
+  .weather-icon {
+    color: var(--color-text-primary);
   }
 
   .date-divider {
@@ -2130,6 +2224,15 @@
   .life-calendar--review-mode .calendar-day:not(.calendar-day--birthday):not(.calendar-day--anniversary) {
     opacity: 0.08 !important;
   }
+
+  /* ========== 时间线圆点深色模式增强 ========== */
+  .entry-item::after {
+    opacity: 0.40;
+  }
+
+  .entry-item:hover::after {
+    opacity: 0.60;
+  }
 }
 
 /* ========================================
@@ -2179,12 +2282,12 @@
 
   /* ========== 确保年份水印使用浅色模式的透明度 ========== */
   .year-divider-number {
-    opacity: 0.1 !important;
+    opacity: 0.08 !important;
     filter: none !important;
   }
 
   .year-divider:hover .year-divider-number {
-    opacity: 0.2 !important;
+    opacity: 0.15 !important;
   }
 
   /* ========== 生命日历浅色模式 ========== */
@@ -2299,17 +2402,17 @@
 }
 
 /* ========================================
-   写作入口 - 安静的书写空间
+   写作入口 - 简洁的书写空间
    设计理念：
-   - 消失的界面：默认低存在感，聚焦时自然展开
-   - 无工具感：像一页空白纸，而非表单
-   - 连续性：写完即回到时间轴，无跳动无弹窗
+   - 三行初始高度，安静的书写邀请
+   - 底部显示当前时间和保存按钮
+   - 支持自定义保存图标
    ======================================== */
 
 .writing-entry {
   position: relative;
   width: 100%;
-  margin: 0 0 var(--spacing-3xl);  /* 80-88px 底部间距，与时间轴拉开距离 */
+  margin: 0 0 var(--spacing-3xl);
 
   /* 提交时的淡出效果 */
   transition: opacity 200ms ease;
@@ -2320,19 +2423,24 @@
   pointer-events: none;
 }
 
-/* 输入区域 */
+/* 输入区域 - 玻璃质感书写空间 */
 .writing-entry-input {
   width: 100%;
-  min-height: 60px;
+  min-height: 96px;  /* 约三行高度 */
   max-height: 400px;
-  padding: 20px 64px 20px 24px; /* 右侧留空给提交按钮 */
+  padding: 16px 20px;
+  padding-bottom: 56px;  /* 增加底部空间，为底部栏留出更多距离 */
 
-  /* 浅色模式背景 */
-  background-color: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  /* 玻璃质感：半透明 + 模糊 */
+  background-color: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
   color: var(--color-text-primary);
 
-  /* 大圆角 - 柔和，像纸张边缘 */
+  /* 柔和圆角 */
   border-radius: 12px;
 
   /* 字体 */
@@ -2345,89 +2453,131 @@
   resize: none;
   outline: none;
   box-sizing: border-box;
-  overflow-y: hidden;  /* 默认隐藏滚动条，通过 JS 控制高度 */
+  overflow-y: hidden;
 
   /* 过渡 */
   transition: background-color var(--transition-normal),
               border-color var(--transition-normal),
               box-shadow var(--transition-normal),
-              height 150ms ease;  /* 高度变化也有过渡 */
+              height 150ms ease;
 }
 
-/* Placeholder 样式 - 安静的邀请 */
+/* Placeholder 样式 - 更淡，暗示可书写 */
 .writing-entry-input::placeholder {
   color: var(--color-text-tertiary);
-  opacity: 0.35;
+  opacity: 0.4;
   font-weight: 300;
-  letter-spacing: 0.3px;
 }
 
-/* 聚焦状态 - 微妙的抬升感 */
+/* 聚焦状态 - 玻璃质感增强 */
 .writing-entry-input:focus {
-  background-color: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* 提交按钮 */
-.writing-entry-submit {
+/* 底部栏：时间 + 保存按钮 */
+.writing-entry-footer {
   position: absolute;
-  right: 12px;
-  bottom: 16px;
+  left: 0;
+  right: 0;
+  bottom: 8px;  /* 与下边框保持 8px 距离 */
+  height: 40px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;  /* 让点击穿透到 textarea */
+}
 
-  width: 36px;
-  height: 36px;
+/* 底部时间显示 - 清晰可感知的时间锚点 */
+.writing-entry-time {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  transition: opacity var(--transition-normal);
+  pointer-events: auto;
+}
+
+/* 聚焦时时间更清晰 */
+.writing-entry:focus-within .writing-entry-time {
+  opacity: 0.9;
+}
+
+/* 保存按钮 */
+.writing-entry-submit {
+  width: 28px;
+  height: 28px;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  background-color: var(--color-text-primary);
-  border: none;
-  border-radius: 50%;
+  background-color: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
 
   cursor: pointer;
+  pointer-events: auto;
 
   /* 默认隐藏 */
   opacity: 0;
-  transform: scale(0.8);
-  pointer-events: none;
+  transform: scale(0.9);
 
   /* 过渡 */
   transition: opacity var(--transition-normal),
               transform var(--transition-normal),
-              background-color var(--transition-fast);
-
-  /* 确保在输入框上方 */
-  z-index: 1;
+              background-color var(--transition-fast),
+              border-color var(--transition-fast);
 }
 
 /* 聚焦时显示按钮 */
-.writing-entry-input:focus ~ .writing-entry-submit,
+.writing-entry:focus-within .writing-entry-submit,
 .writing-entry.submitting .writing-entry-submit {
-  opacity: 1;
+  opacity: 0.5;
   transform: scale(1);
-  pointer-events: all;
 }
 
-/* 提交按钮 hover */
+/* 保存按钮 hover */
 .writing-entry-submit:hover {
-  background-color: var(--color-text-secondary);
-  transform: scale(1.05);
+  opacity: 1 !important;
+  background-color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
 }
 
-/* 提交按钮 active */
+/* 保存按钮 active */
 .writing-entry-submit:active {
   transform: scale(0.95);
 }
 
-/* 提交图标 */
-.submit-icon {
-  width: 18px;
-  height: 18px;
-  display: block;
-  margin: 0 auto;
+/* 自定义图标样式 */
+.submit-icon-custom {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
 }
 
-.submit-icon path {
-  fill: var(--color-bg-primary);
+.writing-entry-submit:hover .submit-icon-custom {
+  opacity: 1;
+  filter: brightness(0) invert(1);  /* hover 时反转为白色 */
+}
+
+/* 备用图标样式 */
+.submit-icon-fallback {
+  width: 70%;
+  height: 70%;
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+}
+
+.writing-entry-submit:hover .submit-icon-fallback {
+  color: var(--color-bg-primary);
 }
 
 /* ========================================
@@ -2450,100 +2600,184 @@
 }
 
 /* ========================================
-   深色模式适配
+   写作入口 - 深色模式适配（玻璃质感）
    ======================================== */
 
 @media (prefers-color-scheme: dark) {
   .writing-entry-input {
-    background-color: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
 
   .writing-entry-input:focus {
     background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.10);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
   .writing-entry-input::placeholder {
-    opacity: 0.4;
+    opacity: 0.35;
+  }
+
+  .writing-entry-time {
+    color: var(--color-text-secondary);
+  }
+
+  .writing-entry-submit {
+    border-color: rgba(255, 255, 255, 0.10);
+  }
+
+  .writing-entry-submit:hover {
+    background-color: var(--color-text-primary);
+    border-color: var(--color-text-primary);
+  }
+
+  .submit-icon-custom {
+    filter: brightness(0) invert(0.7);  /* 深色模式下图标变亮 */
+  }
+
+  .writing-entry-submit:hover .submit-icon-custom {
+    filter: brightness(0) invert(0.1);  /* hover 时变深 */
+  }
+
+  .submit-icon-fallback {
+    color: var(--color-text-secondary);
+  }
+
+  .writing-entry-submit:hover .submit-icon-fallback {
+    color: var(--color-bg-primary);
   }
 }
 
 [data-theme="dark"] .writing-entry-input {
-  background-color: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="dark"] .writing-entry-input:focus {
   background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.10);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="dark"] .writing-entry-input::placeholder {
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
-/* 日间模式的提交按钮样式 */
-[data-theme="light"] .writing-entry-submit {
-  background-color: rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+[data-theme="dark"] .writing-entry-time {
+  color: var(--color-text-secondary);
 }
 
-[data-theme="light"] .writing-entry-submit:hover {
+[data-theme="dark"] .writing-entry-submit {
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+[data-theme="dark"] .writing-entry-submit:hover {
   background-color: var(--color-text-primary);
   border-color: var(--color-text-primary);
 }
 
-[data-theme="light"] .submit-icon path {
-  fill: var(--color-text-primary);  /* 日间模式：深色图标 */
+[data-theme="dark"] .submit-icon-custom {
+  filter: brightness(0) invert(0.7);
 }
 
-[data-theme="light"] .writing-entry-submit:hover .submit-icon path {
-  fill: var(--color-bg-primary);  /* hover 时：浅色图标 */
+[data-theme="dark"] .writing-entry-submit:hover .submit-icon-custom {
+  filter: brightness(0) invert(0.1);
 }
 
-/* 深色模式的提交按钮图标颜色 */
-@media (prefers-color-scheme: dark) {
-  .submit-icon path {
-    fill: #0f1214;  /* 深色背景色 */
-  }
+[data-theme="dark"] .submit-icon-fallback {
+  color: var(--color-text-secondary);
 }
 
-[data-theme="dark"] .submit-icon path {
-  fill: #0f1214;
+[data-theme="dark"] .writing-entry-submit:hover .submit-icon-fallback {
+  color: var(--color-bg-primary);
+}
+
+/* 浅色模式显式定义（玻璃质感）*/
+[data-theme="light"] .writing-entry-input {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04),
+              inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme="light"] .writing-entry-input:focus {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  border-color: rgba(0, 0, 0, 0.10) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="light"] .writing-entry-submit {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .writing-entry-submit:hover {
+  background-color: var(--color-text-primary) !important;
+  border-color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .submit-icon-custom {
+  filter: none !important;
+}
+
+[data-theme="light"] .writing-entry-submit:hover .submit-icon-custom {
+  filter: brightness(0) invert(1) !important;
 }
 
 /* ========================================
-   响应式调整
+   写作入口 - 响应式调整
    ======================================== */
 
 @media (min-width: 768px) {
   .writing-entry-input {
-    padding: 24px 68px 24px 28px;
+    padding: 20px 24px;
+    padding-bottom: 60px;  /* 桌面端更宽松 */
+    min-height: 108px;
+  }
+
+  .writing-entry-footer {
+    height: 44px;
+    padding: 0 20px;
+    bottom: 10px;  /* 桌面端距离稍大 */
   }
 
   .writing-entry-submit {
-    right: 16px;
-    bottom: 20px;
-    width: 38px;
-    height: 38px;
-  }
-
-  .submit-icon {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
   }
 }
 
 @media (max-width: 767px) {
   .writing-entry {
-    margin-bottom: var(--spacing-2xl);  /* 移动端减少底部间距 */
+    margin-bottom: var(--spacing-2xl);
   }
 
   .writing-entry-input {
-    font-size: 15px;  /* 移动端字号略小 */
-    padding: 18px 56px 18px 20px;
+    font-size: 15px;
+    padding: 14px 16px;
+    padding-bottom: 52px;
+    min-height: 88px;
+  }
+
+  .writing-entry-footer {
+    height: 36px;
+    padding: 0 12px;
+    bottom: 6px;
+  }
+
+  .writing-entry-time {
+    font-size: 11px;
+  }
+
+  .writing-entry-submit {
+    width: 26px;
+    height: 26px;
   }
 }

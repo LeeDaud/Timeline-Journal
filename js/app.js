@@ -78,7 +78,7 @@ const DiaryApp = (function() {
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
     const day = now.getDate();
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const weekday = weekdays[now.getDay()];
 
     // 更新 DOM
@@ -100,7 +100,7 @@ const DiaryApp = (function() {
   function updateTimeAnchorFromDate(dateKey) {
     const [year, month, day] = dateKey.split('-').map(Number);
     const date = new Date(year, month - 1, day);
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     const weekday = weekdays[date.getDay()];
 
     const yearEl = document.querySelector('.time-anchor-year');
@@ -143,14 +143,14 @@ const DiaryApp = (function() {
     const diffTime = today - targetDate;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'TODAY';
-    if (diffDays === 1) return 'YESTERDAY';
-    if (diffDays === -1) return 'TOMORROW';
-    if (diffDays > 1 && diffDays <= 7) return `${diffDays}D AGO`;
-    if (diffDays < -1 && diffDays >= -7) return `IN ${-diffDays}D`;
+    if (diffDays === 0) return '今天';
+    if (diffDays === 1) return '昨天';
+    if (diffDays === -1) return '明天';
+    if (diffDays > 1 && diffDays <= 7) return `${diffDays}天前`;
+    if (diffDays < -1 && diffDays >= -7) return `${-diffDays}天后`;
 
     // 超过7天，显示星期
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
     return weekdays[targetDate.getDay()];
   }
 

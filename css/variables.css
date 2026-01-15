@@ -29,14 +29,14 @@
   --spacing-5xl: 162px;               /* 年份级别留白（1.5x）*/
 
   /* 布局 - 优化阅读体验 */
-  --container-max-width: 680px;       /* 内容区最大宽度（收窄，更接近书页）*/
+  --container-max-width: 750px;       /* 内容区最大宽度（+10%，接近 A5 纸张比例）*/
   --container-padding-desktop: 80px;  /* 桌面端左右内边距（增加呼吸感）*/
   --container-padding-tablet: 48px;   /* 平板端左右内边距 */
   --container-padding-mobile: 24px;   /* 移动端左右内边距 */
   --header-height: 48px;              /* 顶部导航高度 */
 
-  /* 时间线系统（新增）*/
-  --timeline-offset: 68px;            /* 时间戳到时间线的距离 */
+  /* 时间线系统（优化后）*/
+  --timeline-offset: 76px;            /* 从 64px 增加到 76px，增加时间戳与圆点间距 */
   --timeline-width: 1px;              /* 时间线粗细 */
   --timeline-color: rgba(0, 0, 0, 0.08); /* 时间线颜色：极淡 */
 

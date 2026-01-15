@@ -1,6 +1,6 @@
 /**
  * writing-entry.js - 写作入口管理器
- * 职责：安静的书写空间，自动高度调整，提交逻辑
+ * 职责：简洁的书写空间，自动高度调整，提交逻辑，时间显示
  */
 
 const WritingEntry = (function() {
@@ -9,6 +9,8 @@ const WritingEntry = (function() {
   let input = null;
   let submit = null;
   let container = null;
+  let timeDisplay = null;
+  let timeUpdateInterval = null;
 
   /**
    * 初始化
@@ -17,6 +19,7 @@ const WritingEntry = (function() {
     input = document.getElementById('writingEntryInput');
     submit = document.getElementById('writingEntrySubmit');
     container = document.getElementById('writingEntry');
+    timeDisplay = document.getElementById('writingEntryTime');
 
     if (!input || !submit || !container) {
       console.error('❌ 写作入口元素未找到');
@@ -24,6 +27,10 @@ const WritingEntry = (function() {
     }
 
     bindEvents();
+    updateTime();  // 初始化时间显示
+    startTimeUpdate();  // 启动时间自动更新
+    initHeight();  // 初始化高度
+
     console.log('✅ 写作入口初始化完成');
   }
 
@@ -35,8 +42,6 @@ const WritingEntry = (function() {
     input.addEventListener('input', autoResize);
 
     // 2. 提交按钮点击
-    // 使用 mousedown 而不是 click，因为 click 会在 blur 之后触发
-    // 导致按钮的 pointer-events 变成 none
     submit.addEventListener('mousedown', (e) => {
       e.preventDefault();  // 防止输入框失焦
       handleSubmit();
@@ -45,32 +50,77 @@ const WritingEntry = (function() {
     // 3. 键盘快捷键：Cmd/Ctrl + Enter 提交
     input.addEventListener('keydown', handleKeydown);
 
-    // 4. 失焦时重置高度（可选）
-    // input.addEventListener('blur', resetHeight);
+    // 4. 聚焦时立即更新时间
+    input.addEventListener('focus', updateTime);
+  }
+
+  /**
+   * 更新时间显示
+   */
+  function updateTime() {
+    if (!timeDisplay) return;
+
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    timeDisplay.textContent = `${hours}:${minutes}`;
+  }
+
+  /**
+   * 启动时间自动更新（每分钟更新一次）
+   */
+  function startTimeUpdate() {
+    // 清除旧的定时器
+    if (timeUpdateInterval) {
+      clearInterval(timeUpdateInterval);
+    }
+
+    // 计算到下一分钟的毫秒数
+    const now = new Date();
+    const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+
+    // 下一分钟更新一次，然后每分钟更新
+    setTimeout(() => {
+      updateTime();
+      timeUpdateInterval = setInterval(updateTime, 60000);
+    }, msToNextMinute);
+  }
+
+  /**
+   * 初始化高度（三行）
+   */
+  function initHeight() {
+    const minRows = parseInt(input.dataset.minRows) || 3;
+    const lineHeight = parseInt(getComputedStyle(input).lineHeight) || 24;
+    const paddingTop = parseInt(getComputedStyle(input).paddingTop) || 16;
+    const paddingBottom = parseInt(getComputedStyle(input).paddingBottom) || 56;
+
+    const initialHeight = minRows * lineHeight + paddingTop + paddingBottom;
+    input.style.height = `${initialHeight}px`;
   }
 
   /**
    * 自动调整高度（根据内容）
    */
   function autoResize() {
-    const minRows = parseInt(input.dataset.minRows) || 1;
+    const minRows = parseInt(input.dataset.minRows) || 3;
     const maxRows = parseInt(input.dataset.maxRows) || 12;
 
     // 重置高度以计算 scrollHeight
     input.style.height = 'auto';
 
     // 计算行数
-    const lineHeight = parseInt(getComputedStyle(input).lineHeight);
-    const padding = parseInt(getComputedStyle(input).paddingTop) +
-                   parseInt(getComputedStyle(input).paddingBottom);
-    const contentHeight = input.scrollHeight - padding;
+    const lineHeight = parseInt(getComputedStyle(input).lineHeight) || 24;
+    const paddingTop = parseInt(getComputedStyle(input).paddingTop) || 16;
+    const paddingBottom = parseInt(getComputedStyle(input).paddingBottom) || 56;
+    const contentHeight = input.scrollHeight - paddingTop - paddingBottom;
     const rows = Math.ceil(contentHeight / lineHeight);
 
     // 限制行数
     const clampedRows = Math.max(minRows, Math.min(rows, maxRows));
 
     // 设置高度
-    const newHeight = clampedRows * lineHeight + padding;
+    const newHeight = clampedRows * lineHeight + paddingTop + paddingBottom;
     input.style.height = `${newHeight}px`;
 
     // 如果超过最大高度，显示滚动条

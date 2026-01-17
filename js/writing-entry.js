@@ -179,16 +179,30 @@ const WritingEntry = (function() {
       // 1. 创建新记录
       const newEntry = DiaryModels.createEntry(content);
 
-      // 2. 保存到 localStorage
+      // 🆕 2. 检查是否有目标日期（从日历点击或跳转来的）
+      const targetDate = DiaryApp.getTargetDate ? DiaryApp.getTargetDate() : null;
+      if (targetDate) {
+        // 使用目标日期替换当前时间（设为当天中午12点）
+        const targetDateTime = new Date(targetDate + 'T12:00:00');
+        newEntry.createdAt = targetDateTime.getTime();
+        newEntry.updatedAt = targetDateTime.getTime();
+
+        // 清除目标日期
+        if (DiaryApp.clearTargetDate) {
+          DiaryApp.clearTargetDate();
+        }
+      }
+
+      // 3. 保存到 localStorage
       DiaryStorage.addEntry(newEntry);
 
-      // 3. 插入到时间轴（带动画）
+      // 4. 插入到时间轴（带动画）
       await insertToTimeline(newEntry);
 
-      // 4. 重置输入框
+      // 5. 重置输入框
       reset();
 
-      // 5. 刷新生命日历（新增了记录）
+      // 6. 刷新生命日历（新增了记录）
       if (typeof DiaryUI !== 'undefined' && DiaryUI.renderLifeCalendar) {
         DiaryUI.renderLifeCalendar();
       }

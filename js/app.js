@@ -30,6 +30,14 @@ const DiaryApp = (function() {
     // 绑定事件
     bindEvents();
 
+    // 🆕 绑定日期跳转和范围设置按钮
+    bindDateJumpButton();
+    bindRangeSettingsButton();
+    bindDateHintClear();
+
+    // 🆕 点击外部关闭 popover
+    document.addEventListener('click', closeAllPopovers);
+
     // 🆕 初始化心理联动（延迟执行，确保 DOM 已渲染）
     setTimeout(() => {
       initPsychologicalSync();
@@ -694,6 +702,9 @@ const DiaryApp = (function() {
     // 立即高亮目标日期（预告）
     updateCalendarHighlight(dateKey);
 
+    // 更新时间锚点
+    updateTimeAnchorFromDate(dateKey);
+
     // 查找该日期是否有记录
     const dateGroup = document.querySelector(`.date-group[data-date="${dateKey}"]`);
 
@@ -701,8 +712,8 @@ const DiaryApp = (function() {
       // 有记录：滚动到该日期分组
       scrollToDateGroup(dateGroup);
     } else {
-      // 无记录：滚动并提示
-      scrollToEmptyDate(dateKey);
+      // 无记录：激活写作入口并设置目标日期（替代原来的弹窗）
+      activateWritingEntryWithDate(dateKey);
     }
   }
 
@@ -1623,11 +1634,447 @@ const DiaryApp = (function() {
     }
   }
 
+  /**
+   * ========================================
+   * 日期跳转功能（Date Jump）
+   * ========================================
+   */
+
+  let dateJumpPopover = null;
+
+  /**
+   * 绑定日期跳转按钮事件
+   */
+  function bindDateJumpButton() {
+    const jumpBtn = document.getElementById('calendarJumpBtn');
+    if (jumpBtn) {
+      jumpBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDateJumpPopover(jumpBtn);
+      });
+    }
+  }
+
+  /**
+   * 切换日期跳转 popover 显示状态
+   */
+  function toggleDateJumpPopover(anchorEl) {
+    if (dateJumpPopover) {
+      closeDateJumpPopover();
+      return;
+    }
+    showDateJumpPopover(anchorEl);
+  }
+
+  /**
+   * 显示日期跳转 popover
+   */
+  function showDateJumpPopover(anchorEl) {
+    const popover = document.createElement('div');
+    popover.className = 'popover popover--date-jump';
+    popover.id = 'dateJumpPopover';
+
+    const today = new Date();
+    const todayStr = DiaryModels.formatDateKey(today);
+
+    popover.innerHTML = `
+      <div class="popover-content">
+        <div class="popover-section">
+          <label class="popover-label">选择日期</label>
+          <input type="date"
+                 class="popover-date-input"
+                 id="jumpDateInput"
+                 value="${todayStr}"
+                 max="${todayStr}">
+        </div>
+        <div class="popover-actions">
+          <button class="popover-btn popover-btn--secondary" id="jumpToTodayBtn">今天</button>
+          <button class="popover-btn popover-btn--primary" id="confirmJumpBtn">跳转</button>
+        </div>
+      </div>
+    `;
+
+    // 定位 popover
+    const rect = anchorEl.getBoundingClientRect();
+    const calendar = document.querySelector('.life-calendar');
+    const calendarRect = calendar ? calendar.getBoundingClientRect() : { left: 0, width: 300 };
+
+    // 在按钮上方显示
+    popover.style.position = 'fixed';
+    popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+    popover.style.left = calendarRect.left + 'px';
+    popover.style.width = calendarRect.width + 'px';
+
+    document.body.appendChild(popover);
+    dateJumpPopover = popover;
+
+    // 绑定事件
+    const dateInput = popover.querySelector('#jumpDateInput');
+    const todayBtn = popover.querySelector('#jumpToTodayBtn');
+    const confirmBtn = popover.querySelector('#confirmJumpBtn');
+
+    todayBtn.addEventListener('click', () => {
+      dateInput.value = todayStr;
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      const selectedDate = dateInput.value;
+      if (selectedDate) {
+        handleDateJump(selectedDate);
+        closeDateJumpPopover();
+      }
+    });
+
+    // Enter 键确认
+    dateInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const selectedDate = dateInput.value;
+        if (selectedDate) {
+          handleDateJump(selectedDate);
+          closeDateJumpPopover();
+        }
+      }
+    });
+
+    // 延迟激活动画
+    setTimeout(() => popover.classList.add('active'), 10);
+
+    // 聚焦日期输入框
+    setTimeout(() => dateInput.focus(), 100);
+  }
+
+  /**
+   * 关闭日期跳转 popover
+   */
+  function closeDateJumpPopover() {
+    if (dateJumpPopover) {
+      dateJumpPopover.classList.remove('active');
+      setTimeout(() => {
+        if (dateJumpPopover && dateJumpPopover.parentNode) {
+          dateJumpPopover.parentNode.removeChild(dateJumpPopover);
+        }
+        dateJumpPopover = null;
+      }, 150);
+    }
+  }
+
+  /**
+   * 处理日期跳转
+   */
+  function handleDateJump(dateKey) {
+    // 1. 更新日历高亮
+    updateCalendarHighlight(dateKey);
+
+    // 2. 滚动日历到目标日期
+    scrollToCalendarDay(dateKey);
+
+    // 3. 更新时间锚点
+    updateTimeAnchorFromDate(dateKey);
+
+    // 4. 检查时间轴是否有该日期的记录
+    const dateGroup = document.querySelector(`.date-group[data-date="${dateKey}"]`);
+    if (dateGroup) {
+      // 有记录：滚动到该日期
+      scrollToDateGroup(dateGroup);
+    } else {
+      // 无记录：激活写作入口并设置目标日期
+      activateWritingEntryWithDate(dateKey);
+    }
+  }
+
+  /**
+   * ========================================
+   * 展示范围设置功能（Range Settings）
+   * ========================================
+   */
+
+  let rangeSettingsPopover = null;
+
+  /**
+   * 绑定展示范围按钮事件
+   */
+  function bindRangeSettingsButton() {
+    const rangeBtn = document.getElementById('calendarRangeBtn');
+    if (rangeBtn) {
+      rangeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleRangeSettingsPopover(rangeBtn);
+      });
+    }
+
+    // 初始化范围文本
+    updateRangeText();
+  }
+
+  /**
+   * 更新范围文本显示
+   */
+  function updateRangeText() {
+    const textEl = document.getElementById('calendarRangeText');
+    if (!textEl) return;
+
+    const birthDate = DiaryStorage.getBirthDate();
+    if (!birthDate) {
+      textEl.textContent = '未设置';
+      return;
+    }
+
+    const currentAge = DiaryModels.getAge(birthDate);
+    const rangeConfig = DiaryStorage.getCalendarRange();
+
+    let startAge, endAge;
+    switch (rangeConfig) {
+      case 'compact':
+        startAge = currentAge;
+        endAge = currentAge;
+        break;
+      case 'extended':
+        startAge = Math.max(0, currentAge - 2);
+        endAge = currentAge;
+        break;
+      case 'all':
+        startAge = 0;
+        endAge = currentAge;
+        break;
+      default:
+        startAge = Math.max(0, currentAge - 1);
+        endAge = currentAge;
+        break;
+    }
+
+    if (startAge === endAge) {
+      textEl.textContent = `第 ${startAge} 岁`;
+    } else {
+      textEl.textContent = `第 ${startAge}～${endAge} 岁`;
+    }
+  }
+
+  /**
+   * 切换范围设置 popover 显示状态
+   */
+  function toggleRangeSettingsPopover(anchorEl) {
+    if (rangeSettingsPopover) {
+      closeRangeSettingsPopover();
+      return;
+    }
+    showRangeSettingsPopover(anchorEl);
+  }
+
+  /**
+   * 显示范围设置 popover
+   */
+  function showRangeSettingsPopover(anchorEl) {
+    const popover = document.createElement('div');
+    popover.className = 'popover popover--range-settings';
+    popover.id = 'rangeSettingsPopover';
+
+    const currentRange = DiaryStorage.getCalendarRange();
+
+    const options = [
+      { value: 'compact', label: '仅当前', desc: '只显示当前年龄' },
+      { value: 'default', label: '近两年', desc: '当前 + 上一年龄' },
+      { value: 'extended', label: '近三年', desc: '当前 + 前两年' },
+      { value: 'all', label: '全部', desc: '从出生至今' }
+    ];
+
+    const optionsHTML = options.map(opt => `
+      <button class="popover-option ${currentRange === opt.value ? 'popover-option--active' : ''}"
+              data-value="${opt.value}">
+        <span class="popover-option-label">${opt.label}</span>
+        <span class="popover-option-desc">${opt.desc}</span>
+      </button>
+    `).join('');
+
+    popover.innerHTML = `
+      <div class="popover-content">
+        <div class="popover-section">
+          <label class="popover-label">展示范围</label>
+          <div class="popover-options">
+            ${optionsHTML}
+          </div>
+        </div>
+      </div>
+    `;
+
+    // 定位 popover
+    const rect = anchorEl.getBoundingClientRect();
+    popover.style.position = 'fixed';
+    popover.style.top = (rect.bottom + 8) + 'px';
+    popover.style.left = rect.left + 'px';
+    popover.style.minWidth = '180px';
+
+    document.body.appendChild(popover);
+    rangeSettingsPopover = popover;
+
+    // 绑定选项点击事件
+    const optionBtns = popover.querySelectorAll('.popover-option');
+    optionBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const value = btn.dataset.value;
+        handleRangeChange(value);
+        closeRangeSettingsPopover();
+      });
+    });
+
+    // 延迟激活动画
+    setTimeout(() => popover.classList.add('active'), 10);
+  }
+
+  /**
+   * 关闭范围设置 popover
+   */
+  function closeRangeSettingsPopover() {
+    if (rangeSettingsPopover) {
+      rangeSettingsPopover.classList.remove('active');
+      setTimeout(() => {
+        if (rangeSettingsPopover && rangeSettingsPopover.parentNode) {
+          rangeSettingsPopover.parentNode.removeChild(rangeSettingsPopover);
+        }
+        rangeSettingsPopover = null;
+      }, 150);
+    }
+  }
+
+  /**
+   * 处理范围变更
+   */
+  function handleRangeChange(rangeValue) {
+    DiaryStorage.setCalendarRange(rangeValue);
+    DiaryUI.renderLifeCalendar();
+    updateRangeText();
+
+    // 延迟滚动到今天
+    setTimeout(() => {
+      scrollCalendarToToday();
+    }, 100);
+  }
+
+  /**
+   * ========================================
+   * 写作入口目标日期功能
+   * ========================================
+   */
+
+  let targetDate = null;  // 目标日期（非今天时使用）
+
+  /**
+   * 激活写作入口并设置目标日期
+   */
+  function activateWritingEntryWithDate(dateKey) {
+    const input = document.getElementById('writingEntryInput');
+    const dateHint = document.getElementById('writingEntryDateHint');
+    const dateHintText = dateHint ? dateHint.querySelector('.date-hint-text') : null;
+
+    if (!input) return;
+
+    // 检查是否是今天
+    const today = DiaryModels.formatDateKey(new Date());
+    const isToday = dateKey === today;
+
+    if (isToday) {
+      // 今天：清除目标日期
+      clearTargetDate();
+    } else {
+      // 非今天：设置目标日期
+      targetDate = dateKey;
+
+      // 显示日期提示
+      if (dateHint && dateHintText) {
+        const [year, month, day] = dateKey.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
+        const displayDate = date.toLocaleDateString('zh-CN', {
+          month: 'long',
+          day: 'numeric'
+        });
+        dateHintText.textContent = `为 ${displayDate} 写`;
+        dateHint.classList.add('visible');
+      }
+    }
+
+    // 聚焦输入框
+    input.focus();
+
+    // 滚动到写作入口区域
+    const writingEntry = document.getElementById('writingEntry');
+    if (writingEntry) {
+      const rect = writingEntry.getBoundingClientRect();
+      const headerHeight = 48;
+      const timeAnchorHeight = 64;
+
+      if (rect.top < headerHeight + timeAnchorHeight + 20) {
+        window.scrollTo({
+          top: window.pageYOffset + rect.top - headerHeight - timeAnchorHeight - 40,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }
+
+  /**
+   * 清除目标日期
+   */
+  function clearTargetDate() {
+    targetDate = null;
+
+    const dateHint = document.getElementById('writingEntryDateHint');
+    if (dateHint) {
+      dateHint.classList.remove('visible');
+    }
+  }
+
+  /**
+   * 获取当前目标日期
+   */
+  function getTargetDate() {
+    return targetDate;
+  }
+
+  /**
+   * 绑定日期提示清除按钮
+   */
+  function bindDateHintClear() {
+    const clearBtn = document.getElementById('dateHintClear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        clearTargetDate();
+
+        // 重新聚焦输入框
+        const input = document.getElementById('writingEntryInput');
+        if (input) input.focus();
+      });
+    }
+  }
+
+  /**
+   * 关闭所有 popover（点击外部时）
+   */
+  function closeAllPopovers(event) {
+    // 日期跳转 popover
+    if (dateJumpPopover && !dateJumpPopover.contains(event.target)) {
+      const jumpBtn = document.getElementById('calendarJumpBtn');
+      if (!jumpBtn || !jumpBtn.contains(event.target)) {
+        closeDateJumpPopover();
+      }
+    }
+
+    // 范围设置 popover
+    if (rangeSettingsPopover && !rangeSettingsPopover.contains(event.target)) {
+      const rangeBtn = document.getElementById('calendarRangeBtn');
+      if (!rangeBtn || !rangeBtn.contains(event.target)) {
+        closeRangeSettingsPopover();
+      }
+    }
+  }
+
   // 公开接口
   return {
     init,
     refreshTimeline,
-    scrollCalendarToToday  // 🆕 暴露给其他模块使用
+    scrollCalendarToToday,  // 🆕 暴露给其他模块使用
+    getTargetDate,          // 🆕 获取目标日期（供 WritingEntry 使用）
+    clearTargetDate         // 🆕 清除目标日期
   };
 })();
 

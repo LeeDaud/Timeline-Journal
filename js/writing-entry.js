@@ -50,8 +50,14 @@ const WritingEntry = (function() {
     // 3. 键盘快捷键：Cmd/Ctrl + Enter 提交
     input.addEventListener('keydown', handleKeydown);
 
-    // 4. 聚焦时立即更新时间
-    input.addEventListener('focus', updateTime);
+    // 4. 聚焦时立即更新时间，并滚动日历到今天
+    input.addEventListener('focus', () => {
+      updateTime();
+      // 🆕 滚动生命日历到今天
+      if (typeof DiaryApp !== 'undefined' && DiaryApp.scrollCalendarToToday) {
+        DiaryApp.scrollCalendarToToday();
+      }
+    });
   }
 
   /**

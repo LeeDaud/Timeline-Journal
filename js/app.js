@@ -33,6 +33,8 @@ const DiaryApp = (function() {
     // 🆕 初始化心理联动（延迟执行，确保 DOM 已渲染）
     setTimeout(() => {
       initPsychologicalSync();
+      // 🆕 初始加载时滚动到今天
+      scrollCalendarToToday();
     }, 100);
 
     console.log('✅ 应用启动完成');
@@ -1182,6 +1184,16 @@ const DiaryApp = (function() {
     }
   }
 
+  /**
+   * 滚动生命日历到今天
+   * 用于页面加载时和输入框聚焦时
+   */
+  function scrollCalendarToToday() {
+    const today = new Date();
+    const todayKey = DiaryModels.formatDateKey(today);
+    scrollToCalendarDay(todayKey);
+  }
+
   // 点击页面其他地方时关闭菜单（延迟检测，避免菜单切换时误触发）
   document.addEventListener('click', (event) => {
     // 延迟检测，让菜单内部的点击事件先处理
@@ -1614,7 +1626,8 @@ const DiaryApp = (function() {
   // 公开接口
   return {
     init,
-    refreshTimeline
+    refreshTimeline,
+    scrollCalendarToToday  // 🆕 暴露给其他模块使用
   };
 })();
 

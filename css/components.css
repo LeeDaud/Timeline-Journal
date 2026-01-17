@@ -945,6 +945,13 @@
   margin-bottom: 8px;
   padding-bottom: 6px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+
+  /* 🆕 常驻顶部 */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--color-bg-primary);
+  padding-top: 4px;  /* 顶部留些空间 */
 }
 
 .week-number-cell {
@@ -1051,18 +1058,17 @@
   background-color: rgba(0, 0, 0, 0.15);
 }
 
-/* 今天 */
+/* 今天 - 柔和的标识，不抢夺注意力 */
 .calendar-day--today {
-  background-color: var(--color-text-primary);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(0, 0, 0, 0.25);  /* 半透明深色，比 recorded 稍深 */
+  border: 1px solid rgba(0, 0, 0, 0.3);   /* 细边框强化轮廓 */
   box-sizing: border-box;
   opacity: 1 !important;  /* 今天始终全亮 */
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);  /* 内发光增强锚点感 */
 }
 
 /* 今天 + 有记录 */
 .calendar-day--today.calendar-day--recorded {
-  background-color: var(--color-text-primary);
+  background-color: rgba(0, 0, 0, 0.30);  /* 稍微加深 */
 }
 
 /* Hover 效果：微微放大 */
@@ -1092,7 +1098,7 @@
 }
 
 .calendar-day--today.calendar-day--active {
-  background-color: var(--color-text-primary);
+  background-color: rgba(0, 0, 0, 0.35);  /* 稍微加深，表示同时是今天和当前浏览 */
 }
 
 /* 🆕 联动时的微妙脉动（仅在激活瞬间）*/
@@ -1177,11 +1183,11 @@
   background-color: rgba(47, 79, 108, 0.20) !important;
 }
 
-/* 生日 + 今天：特殊组合 */
+/* 生日 + 今天：特殊组合 - 保持生日的特殊感，稍微加深 */
 .calendar-day--birthday.calendar-day--today {
-  background-color: var(--color-text-primary) !important;
+  background-color: rgba(47, 79, 108, 0.25) !important;  /* 生日色调的半透明 */
   border-color: var(--color-birthday);
-  box-shadow: inset 0 0 0 1px rgba(47, 79, 108, 0.3);
+  border-width: 2px;  /* 加粗边框突出 */
 }
 
 /* 层级 1：纪念日（Anniversary）- 人生重要节点 */
@@ -1209,11 +1215,11 @@
   background-color: rgba(139, 99, 56, 0.16) !important;
 }
 
-/* 纪念日 + 今天：特殊组合 */
+/* 纪念日 + 今天：特殊组合 - 保持纪念日的特殊感，稍微加深 */
 .calendar-day--anniversary.calendar-day--today {
-  background-color: var(--color-text-primary) !important;
+  background-color: rgba(139, 99, 56, 0.22) !important;  /* 纪念日色调的半透明 */
   border-color: var(--color-anniversary);
-  box-shadow: inset 0 0 0 1px rgba(139, 99, 56, 0.3);
+  border-width: 2px;  /* 加粗边框突出 */
 }
 
 /* 层级 2：普通特殊日期（Special）- 值得标记但非节点 */
@@ -1829,15 +1835,14 @@
     background-color: rgba(255, 255, 255, 0.20);
   }
 
-  /* 今天 - 使用暖白色高亮 */
+  /* 今天 - 柔和的标识 */
   .calendar-day--today {
-    background-color: var(--color-text-primary);  /* 暖白色 */
-    border-color: rgba(0, 0, 0, 0.2);
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);  /* 内发光增强锚点感 */
+    background-color: rgba(255, 255, 255, 0.30);  /* 半透明亮色，比 recorded 稍亮 */
+    border: 1px solid rgba(255, 255, 255, 0.35);  /* 细边框强化轮廓 */
   }
 
   .calendar-day--today.calendar-day--recorded {
-    background-color: var(--color-text-primary);
+    background-color: rgba(255, 255, 255, 0.35);  /* 稍微加亮 */
   }
 
   /* Hover 效果 */
@@ -1864,7 +1869,7 @@
   }
 
   .calendar-day--today.calendar-day--active {
-    background-color: var(--color-text-primary);
+    background-color: rgba(255, 255, 255, 0.40);  /* 稍微加亮 */
   }
 
   /* 脉动动画调整 */
@@ -1907,9 +1912,9 @@
   }
 
   .calendar-day--birthday.calendar-day--today {
-    background-color: var(--color-text-primary) !important;
+    background-color: rgba(122, 155, 184, 0.30) !important;  /* 深色模式下的生日+今天 */
     border-color: var(--color-birthday);
-    box-shadow: inset 0 0 0 1px rgba(122, 155, 184, 0.4);
+    border-width: 2px;
   }
 
   /* 特殊日期 - 纪念日（暖棕边框）*/
@@ -1929,9 +1934,9 @@
   }
 
   .calendar-day--anniversary.calendar-day--today {
-    background-color: var(--color-text-primary) !important;
+    background-color: rgba(184, 148, 107, 0.28) !important;  /* 深色模式下的纪念日+今天 */
     border-color: var(--color-anniversary);
-    box-shadow: inset 0 0 0 1px rgba(184, 148, 107, 0.4);
+    border-width: 2px;
   }
 
   /* 普通特殊日期圆点 */
@@ -1946,6 +1951,7 @@
   /* 星期头部和周数标签 */
   .calendar-weekday-header {
     border-bottom-color: rgba(255, 255, 255, 0.06);
+    background-color: var(--color-bg-primary);  /* 🆕 确保深色模式下背景色正确 */
   }
 
   /* 回顾模式下的日历调整 */
@@ -2143,13 +2149,12 @@
   }
 
   .calendar-day--today {
-    background-color: var(--color-text-primary);
-    border-color: rgba(0, 0, 0, 0.2);
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);  /* 内发光增强锚点感 */
+    background-color: rgba(255, 255, 255, 0.30);  /* 半透明亮色 */
+    border: 1px solid rgba(255, 255, 255, 0.35);
   }
 
   .calendar-day--today.calendar-day--recorded {
-    background-color: var(--color-text-primary);
+    background-color: rgba(255, 255, 255, 0.35);
   }
 
   .calendar-day:hover:not(.calendar-day--empty) {
@@ -2174,7 +2179,7 @@
   }
 
   .calendar-day--today.calendar-day--active {
-    background-color: var(--color-text-primary);
+    background-color: rgba(255, 255, 255, 0.40);
   }
 
   @keyframes calendarPulse {
@@ -2213,9 +2218,9 @@
   }
 
   .calendar-day--birthday.calendar-day--today {
-    background-color: var(--color-text-primary) !important;
+    background-color: rgba(122, 155, 184, 0.30) !important;
     border-color: var(--color-birthday);
-    box-shadow: inset 0 0 0 1px rgba(122, 155, 184, 0.4);
+    border-width: 2px;
   }
 
   .calendar-day--anniversary {
@@ -2234,9 +2239,9 @@
   }
 
   .calendar-day--anniversary.calendar-day--today {
-    background-color: var(--color-text-primary) !important;
+    background-color: rgba(184, 148, 107, 0.28) !important;
     border-color: var(--color-anniversary);
-    box-shadow: inset 0 0 0 1px rgba(184, 148, 107, 0.4);
+    border-width: 2px;
   }
 
   .calendar-day--special::after {
@@ -2249,6 +2254,7 @@
 
   .calendar-weekday-header {
     border-bottom-color: rgba(255, 255, 255, 0.06);
+    background-color: var(--color-bg-primary);  /* 🆕 确保深色模式下背景色正确 */
   }
 
   .life-calendar--review-mode .calendar-day:not(.calendar-day--birthday):not(.calendar-day--anniversary) {
@@ -2340,13 +2346,12 @@
   }
 
   .calendar-day--today {
-    background-color: var(--color-text-primary) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15) !important;  /* 内发光增强锚点感 */
+    background-color: rgba(0, 0, 0, 0.25) !important;  /* 半透明深色 */
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;
   }
 
   .calendar-day--today.calendar-day--recorded {
-    background-color: var(--color-text-primary) !important;
+    background-color: rgba(0, 0, 0, 0.30) !important;
   }
 
   .calendar-day:hover:not(.calendar-day--empty) {
@@ -2371,7 +2376,7 @@
   }
 
   .calendar-day--today.calendar-day--active {
-    background-color: var(--color-text-primary) !important;
+    background-color: rgba(0, 0, 0, 0.35) !important;
   }
 
   .calendar-day--month-start::before {
@@ -2394,9 +2399,9 @@
   }
 
   .calendar-day--birthday.calendar-day--today {
-    background-color: var(--color-text-primary) !important;
+    background-color: rgba(47, 79, 108, 0.25) !important;
     border-color: var(--color-birthday) !important;
-    box-shadow: inset 0 0 0 1px rgba(47, 79, 108, 0.3) !important;
+    border-width: 2px !important;
   }
 
   .calendar-day--anniversary {
@@ -2415,9 +2420,9 @@
   }
 
   .calendar-day--anniversary.calendar-day--today {
-    background-color: var(--color-text-primary) !important;
+    background-color: rgba(139, 99, 56, 0.22) !important;
     border-color: var(--color-anniversary) !important;
-    box-shadow: inset 0 0 0 1px rgba(139, 99, 56, 0.3) !important;
+    border-width: 2px !important;
   }
 
   .calendar-day--special::after {

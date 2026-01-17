@@ -51,9 +51,30 @@ const DiaryUI = (function() {
       timeOpacity = 0.6;    // 昨天
     }
 
+    // 🆕 条目天气图标
+    let weatherHTML = '';
+    if (entry.weather) {
+      const weatherIcons = {
+        sunny: '晴',
+        cloudy: '阴',
+        rainy: '雨',
+        snowy: '雪',
+        foggy: '雾',
+        windy: '风',
+        stormy: '雷'
+      };
+      const icon = weatherIcons[entry.weather] || '';
+      if (icon) {
+        weatherHTML = `<span class="entry-weather">${icon}</span>`;
+      }
+    }
+
     return `
       <div class="entry-item ${lengthClass}" data-id="${entry.id}">
-        <div class="entry-time" style="opacity: ${timeOpacity}">${time}</div>
+        <div class="entry-meta">
+          <span class="entry-time" style="opacity: ${timeOpacity}">${time}</span>
+          ${weatherHTML}
+        </div>
         <div class="entry-content">${content}</div>
       </div>
     `;

@@ -451,10 +451,17 @@
   margin-bottom: 16px;
 }
 
-/* 时间戳 - 收窄宽度 */
-.entry-time {
-  width: 52px;                       /* 从 56px 收窄到 52px */
+/* 时间戳容器 */
+.entry-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 60px;
   flex-shrink: 0;
+}
+
+/* 时间戳 */
+.entry-time {
   font-size: var(--font-size-time);  /* 12px，已在变量中增强 */
   font-weight: 500;                  /* 增加字重 */
   color: var(--color-text-secondary);
@@ -465,6 +472,20 @@
   position: relative;
   letter-spacing: 0.3px;             /* 增加字间距 */
   font-variant-numeric: tabular-nums; /* 等宽数字 */
+}
+
+/* 条目天气文字 */
+.entry-weather {
+  font-size: 11px;
+  opacity: 0.4;
+  padding-top: 3px;
+  transition: opacity var(--transition-fast);
+  color: var(--color-text-tertiary);
+  font-weight: 400;
+}
+
+.entry-item:hover .entry-weather {
+  opacity: 0.8;
 }
 
 .entry-item:hover .entry-time {
@@ -2659,8 +2680,27 @@
   padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
   pointer-events: none;  /* 让点击穿透到 textarea */
+}
+
+/* 时间按钮 */
+.writing-entry-time-btn {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all var(--transition-fast);
+}
+
+.writing-entry-time-btn:hover {
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 /* 底部时间显示 - 清晰可感知的时间锚点 */
@@ -2672,7 +2712,12 @@
   letter-spacing: 0.5px;
   font-variant-numeric: tabular-nums;
   transition: opacity var(--transition-normal);
-  pointer-events: auto;
+}
+
+/* 自定义时间时的样式 */
+.writing-entry-time.time--custom {
+  color: var(--color-birthday);
+  opacity: 0.9;
 }
 
 /* 聚焦时时间更清晰 */
@@ -2680,8 +2725,49 @@
   opacity: 0.9;
 }
 
-/* 保存按钮 */
+/* 天气按钮 */
+.writing-entry-weather-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1px dashed transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0.5;
+  transition: all var(--transition-fast);
+}
+
+.writing-entry-weather-btn:hover {
+  opacity: 0.8;
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.weather-icon-mini {
+  font-size: 12px;
+  line-height: 1;
+  color: var(--color-text-secondary);
+}
+
+.weather-icon-mini:not(.has-weather)::before {
+  content: '·';
+  font-size: 14px;
+  color: var(--color-text-tertiary);
+  opacity: 0.5;
+}
+
+.weather-icon-mini.has-weather {
+  opacity: 0.8;
+}
+
+/* 保存按钮推到最右边 */
 .writing-entry-submit {
+  margin-left: auto;
   width: 28px;
   height: 28px;
   padding: 0;
@@ -3224,6 +3310,434 @@
 }
 
 .popover-option--active {
+  background-color: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.10);
+}
+
+/* ========================================
+   深色日期跳转日历 Popover
+   设计理念：深色、低对比、克制、叙事感
+   ======================================== */
+
+.date-jump-popover {
+  position: fixed;
+  z-index: 400;
+  background-color: var(--color-bg-elevated-2, #1a1d21);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+              0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 12px;
+  min-width: 240px;
+  max-width: 300px;
+
+  /* 入场动画 */
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 180ms ease, transform 180ms ease;
+  pointer-events: none;
+}
+
+.date-jump-popover.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* 日历头部 */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.cal-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #9ba5a8);
+  letter-spacing: 0.5px;
+}
+
+.cal-nav {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--color-text-tertiary, #6e6860);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.cal-nav:hover:not(:disabled) {
+  color: var(--color-text-secondary, #9ba5a8);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.cal-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* 星期头 */
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 6px;
+}
+
+.cal-weekday {
+  font-size: 10px;
+  color: var(--color-text-tertiary, #6e6860);
+  text-align: center;
+  padding: 4px 0;
+  letter-spacing: 0.5px;
+}
+
+/* 日期网格 */
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--color-text-secondary, #9ba5a8);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.cal-day:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary, #e8e0d5);
+}
+
+.cal-day:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* 非当月日期 */
+.cal-day--other {
+  color: var(--color-text-tertiary, #6e6860);
+  opacity: 0.5;
+}
+
+.cal-day--other:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+/* 今天 */
+.cal-day--today {
+  color: var(--color-text-primary, #e8e0d5);
+  border-color: rgba(255, 255, 255, 0.15);
+  font-weight: 500;
+}
+
+/* 未来日期（禁用） */
+.cal-day--future {
+  color: var(--color-text-tertiary, #6e6860);
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* 底部"今天"按钮 */
+.cal-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: center;
+}
+
+.cal-today-btn {
+  font-size: 11px;
+  color: var(--color-text-tertiary, #6e6860);
+  background: transparent;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  letter-spacing: 0.5px;
+}
+
+.cal-today-btn:hover {
+  color: var(--color-text-secondary, #9ba5a8);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* 浅色模式覆盖 */
+:root:not([data-theme="dark"]) .date-jump-popover {
+  background-color: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15),
+              0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+:root:not([data-theme="dark"]) .cal-title {
+  color: var(--color-text-secondary);
+}
+
+:root:not([data-theme="dark"]) .cal-nav {
+  color: var(--color-text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .cal-nav:hover:not(:disabled) {
+  color: var(--color-text-secondary);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+:root:not([data-theme="dark"]) .cal-weekday {
+  color: var(--color-text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .cal-day {
+  color: var(--color-text-secondary);
+}
+
+:root:not([data-theme="dark"]) .cal-day:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--color-text-primary);
+}
+
+:root:not([data-theme="dark"]) .cal-day--other {
+  color: var(--color-text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .cal-day--today {
+  color: var(--color-text-primary);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+:root:not([data-theme="dark"]) .cal-day--future {
+  color: var(--color-text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .cal-footer {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+:root:not([data-theme="dark"]) .cal-today-btn {
+  color: var(--color-text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .cal-today-btn:hover {
+  color: var(--color-text-secondary);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* 深色模式媒体查询 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .date-jump-popover {
+    background-color: var(--color-bg-elevated-2, #1a1d21);
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ========================================
+   时间编辑 Popover
+   ======================================== */
+
+.time-edit-popover {
+  position: fixed;
+  z-index: 400;
+  background-color: var(--color-bg-elevated-2, #1a1d21);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+              0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px;
+
+  /* 入场动画 */
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 150ms ease, transform 150ms ease;
+  pointer-events: none;
+}
+
+.time-edit-popover.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.time-edit-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-edit-input {
+  width: 90px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary, #e8e0d5);
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 6px;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.time-edit-input:focus {
+  border-color: rgba(255, 255, 255, 0.20);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.time-edit-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.7);
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.time-edit-now {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--color-text-tertiary, #6e6860);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.time-edit-now:hover {
+  color: var(--color-text-secondary, #9ba5a8);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* 浅色模式 */
+:root:not([data-theme="dark"]) .time-edit-popover {
+  background-color: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
+              0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+:root:not([data-theme="dark"]) .time-edit-input {
+  color: var(--color-text-primary);
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.10);
+}
+
+:root:not([data-theme="dark"]) .time-edit-input:focus {
+  border-color: rgba(0, 0, 0, 0.20);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+:root:not([data-theme="dark"]) .time-edit-input::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+:root:not([data-theme="dark"]) .time-edit-now:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+:root:not([data-theme="dark"]) .writing-entry-time-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+:root:not([data-theme="dark"]) .writing-entry-weather-btn:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* ========================================
+   天气选择 Popover
+   ======================================== */
+
+.weather-select-popover {
+  position: fixed;
+  z-index: 400;
+  background-color: var(--color-bg-elevated-2, #1a1d21);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+              0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px;
+
+  /* 入场动画 */
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 150ms ease, transform 150ms ease;
+  pointer-events: none;
+}
+
+.weather-select-popover.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.weather-options-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.weather-option {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+
+.weather-option:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+.weather-option--active {
+  background-color: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.weather-option-icon {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--color-text-secondary);
+}
+
+/* 浅色模式 */
+:root:not([data-theme="dark"]) .weather-select-popover {
+  background-color: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
+              0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+:root:not([data-theme="dark"]) .weather-option:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+:root:not([data-theme="dark"]) .weather-option--active {
   background-color: rgba(0, 0, 0, 0.06);
   border-color: rgba(0, 0, 0, 0.10);
 }

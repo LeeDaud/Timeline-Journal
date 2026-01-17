@@ -1,6 +1,6 @@
 /**
  * writing-entry.js - 写作入口管理器
- * 职责：简洁的书写空间，自动高度调整，提交逻辑，时间显示
+ * 职责：简洁的书写空间，自动高度调整，提交逻辑，时间显示，天气选择
  */
 
 const WritingEntry = (function() {
@@ -10,7 +10,28 @@ const WritingEntry = (function() {
   let submit = null;
   let container = null;
   let timeDisplay = null;
+  let timeBtn = null;
+  let weatherBtn = null;
+  let weatherIcon = null;
   let timeUpdateInterval = null;
+
+  // 状态
+  let customTime = null;       // 自定义时间 (HH:mm)，null 表示使用当前时间
+  let selectedWeather = '';    // 选中的天气类型
+  let timePopover = null;
+  let weatherPopover = null;
+
+  // 天气配置（文字极简风格）
+  const WEATHER_OPTIONS = [
+    { id: '', icon: '·', label: '无' },
+    { id: 'sunny', icon: '晴', label: '晴' },
+    { id: 'cloudy', icon: '阴', label: '阴' },
+    { id: 'rainy', icon: '雨', label: '雨' },
+    { id: 'snowy', icon: '雪', label: '雪' },
+    { id: 'foggy', icon: '雾', label: '雾' },
+    { id: 'windy', icon: '风', label: '风' },
+    { id: 'stormy', icon: '雷', label: '雷' }
+  ];
 
   /**
    * 初始化
@@ -20,6 +41,9 @@ const WritingEntry = (function() {
     submit = document.getElementById('writingEntrySubmit');
     container = document.getElementById('writingEntry');
     timeDisplay = document.getElementById('writingEntryTime');
+    timeBtn = document.getElementById('writingEntryTimeBtn');
+    weatherBtn = document.getElementById('writingEntryWeatherBtn');
+    weatherIcon = document.getElementById('writingEntryWeatherIcon');
 
     if (!input || !submit || !container) {
       console.error('❌ 写作入口元素未找到');
@@ -30,6 +54,7 @@ const WritingEntry = (function() {
     updateTime();  // 初始化时间显示
     startTimeUpdate();  // 启动时间自动更新
     initHeight();  // 初始化高度
+    updateWeatherIcon();  // 初始化天气图标
 
     console.log('✅ 写作入口初始化完成');
   }
@@ -58,6 +83,27 @@ const WritingEntry = (function() {
         DiaryApp.scrollCalendarToToday();
       }
     });
+
+    // 5. 时间按钮点击
+    if (timeBtn) {
+      timeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleTimePopover();
+      });
+    }
+
+    // 6. 天气按钮点击
+    if (weatherBtn) {
+      weatherBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleWeatherPopover();
+      });
+    }
+
+    // 7. 点击外部关闭 popover
+    document.addEventListener('click', closeAllPopovers);
   }
 
   /**
@@ -66,10 +112,18 @@ const WritingEntry = (function() {
   function updateTime() {
     if (!timeDisplay) return;
 
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    timeDisplay.textContent = `${hours}:${minutes}`;
+    if (customTime) {
+      // 使用自定义时间
+      timeDisplay.textContent = customTime;
+      timeDisplay.classList.add('time--custom');
+    } else {
+      // 使用当前时间
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      timeDisplay.textContent = `${hours}:${minutes}`;
+      timeDisplay.classList.remove('time--custom');
+    }
   }
 
   /**
@@ -90,6 +144,194 @@ const WritingEntry = (function() {
       updateTime();
       timeUpdateInterval = setInterval(updateTime, 60000);
     }, msToNextMinute);
+  }
+
+  /**
+   * ========================================
+   * 时间编辑 Popover
+   * ========================================
+   */
+
+  function toggleTimePopover() {
+    if (timePopover) {
+      closeTimePopover();
+      return;
+    }
+    showTimePopover();
+  }
+
+  function showTimePopover() {
+    closeWeatherPopover();
+
+    const popover = document.createElement('div');
+    popover.className = 'time-edit-popover';
+    popover.id = 'timeEditPopover';
+
+    const currentTime = customTime || timeDisplay.textContent;
+
+    popover.innerHTML = `
+      <div class="time-edit-content">
+        <input type="time"
+               class="time-edit-input"
+               id="timeEditInput"
+               value="${currentTime}">
+        <button class="time-edit-now" id="timeEditNow">现在</button>
+      </div>
+    `;
+
+    // 定位
+    const rect = timeBtn.getBoundingClientRect();
+    popover.style.position = 'fixed';
+    popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+    popover.style.left = rect.left + 'px';
+
+    document.body.appendChild(popover);
+    timePopover = popover;
+
+    // 绑定事件
+    const timeInput = popover.querySelector('#timeEditInput');
+    const nowBtn = popover.querySelector('#timeEditNow');
+
+    timeInput.addEventListener('change', () => {
+      customTime = timeInput.value;
+      updateTime();
+    });
+
+    timeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        customTime = timeInput.value;
+        updateTime();
+        closeTimePopover();
+      }
+      if (e.key === 'Escape') {
+        closeTimePopover();
+      }
+    });
+
+    nowBtn.addEventListener('click', () => {
+      customTime = null;
+      updateTime();
+      closeTimePopover();
+    });
+
+    // 延迟激活动画
+    setTimeout(() => {
+      popover.classList.add('active');
+      timeInput.focus();
+      timeInput.select();
+    }, 10);
+  }
+
+  function closeTimePopover() {
+    if (timePopover) {
+      timePopover.classList.remove('active');
+      setTimeout(() => {
+        if (timePopover && timePopover.parentNode) {
+          timePopover.parentNode.removeChild(timePopover);
+        }
+        timePopover = null;
+      }, 150);
+    }
+  }
+
+  /**
+   * ========================================
+   * 天气选择 Popover
+   * ========================================
+   */
+
+  function toggleWeatherPopover() {
+    if (weatherPopover) {
+      closeWeatherPopover();
+      return;
+    }
+    showWeatherPopover();
+  }
+
+  function showWeatherPopover() {
+    closeTimePopover();
+
+    const popover = document.createElement('div');
+    popover.className = 'weather-select-popover';
+    popover.id = 'weatherSelectPopover';
+
+    const optionsHTML = WEATHER_OPTIONS.map(opt => `
+      <button class="weather-option ${selectedWeather === opt.id ? 'weather-option--active' : ''}"
+              data-weather="${opt.id}"
+              title="${opt.label}">
+        <span class="weather-option-icon">${opt.icon || '·'}</span>
+      </button>
+    `).join('');
+
+    popover.innerHTML = `
+      <div class="weather-options-grid">
+        ${optionsHTML}
+      </div>
+    `;
+
+    // 定位
+    const rect = weatherBtn.getBoundingClientRect();
+    popover.style.position = 'fixed';
+    popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
+    popover.style.left = (rect.left - 60) + 'px';
+
+    document.body.appendChild(popover);
+    weatherPopover = popover;
+
+    // 绑定事件
+    popover.addEventListener('click', (e) => {
+      const option = e.target.closest('.weather-option');
+      if (option) {
+        selectedWeather = option.dataset.weather;
+        updateWeatherIcon();
+        closeWeatherPopover();
+      }
+    });
+
+    // 延迟激活动画
+    setTimeout(() => popover.classList.add('active'), 10);
+  }
+
+  function closeWeatherPopover() {
+    if (weatherPopover) {
+      weatherPopover.classList.remove('active');
+      setTimeout(() => {
+        if (weatherPopover && weatherPopover.parentNode) {
+          weatherPopover.parentNode.removeChild(weatherPopover);
+        }
+        weatherPopover = null;
+      }, 150);
+    }
+  }
+
+  /**
+   * 更新天气图标显示
+   */
+  function updateWeatherIcon() {
+    if (!weatherIcon) return;
+
+    const weather = WEATHER_OPTIONS.find(w => w.id === selectedWeather);
+    if (weather && weather.icon) {
+      weatherIcon.textContent = weather.icon;
+      weatherIcon.classList.add('has-weather');
+    } else {
+      weatherIcon.textContent = '';
+      weatherIcon.classList.remove('has-weather');
+    }
+  }
+
+  /**
+   * 关闭所有 popover
+   */
+  function closeAllPopovers(e) {
+    // 时间 popover
+    if (timePopover && !timePopover.contains(e.target) && !timeBtn.contains(e.target)) {
+      closeTimePopover();
+    }
+    // 天气 popover
+    if (weatherPopover && !weatherPopover.contains(e.target) && !weatherBtn.contains(e.target)) {
+      closeWeatherPopover();
+    }
   }
 
   /**
@@ -181,28 +423,50 @@ const WritingEntry = (function() {
 
       // 🆕 2. 检查是否有目标日期（从日历点击或跳转来的）
       const targetDate = DiaryApp.getTargetDate ? DiaryApp.getTargetDate() : null;
-      if (targetDate) {
-        // 使用目标日期替换当前时间（设为当天中午12点）
-        const targetDateTime = new Date(targetDate + 'T12:00:00');
-        newEntry.createdAt = targetDateTime.getTime();
-        newEntry.updatedAt = targetDateTime.getTime();
 
+      // 🆕 3. 处理时间
+      let entryDate;
+      if (targetDate) {
+        // 目标日期 + 自定义时间或默认中午
+        const [year, month, day] = targetDate.split('-').map(Number);
+        if (customTime) {
+          const [hours, minutes] = customTime.split(':').map(Number);
+          entryDate = new Date(year, month - 1, day, hours, minutes);
+        } else {
+          entryDate = new Date(year, month - 1, day, 12, 0);
+        }
         // 清除目标日期
         if (DiaryApp.clearTargetDate) {
           DiaryApp.clearTargetDate();
         }
+      } else if (customTime) {
+        // 今天 + 自定义时间
+        const today = new Date();
+        const [hours, minutes] = customTime.split(':').map(Number);
+        entryDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), hours, minutes);
+      } else {
+        // 当前时间
+        entryDate = new Date();
       }
 
-      // 3. 保存到 localStorage
+      newEntry.createdAt = entryDate.getTime();
+      newEntry.updatedAt = entryDate.getTime();
+
+      // 🆕 4. 添加天气信息
+      if (selectedWeather) {
+        newEntry.weather = selectedWeather;
+      }
+
+      // 5. 保存到 localStorage
       DiaryStorage.addEntry(newEntry);
 
-      // 4. 插入到时间轴（带动画）
+      // 6. 插入到时间轴（带动画）
       await insertToTimeline(newEntry);
 
-      // 5. 重置输入框
+      // 7. 重置输入框和状态
       reset();
 
-      // 6. 刷新生命日历（新增了记录）
+      // 8. 刷新生命日历（新增了记录）
       if (typeof DiaryUI !== 'undefined' && DiaryUI.renderLifeCalendar) {
         DiaryUI.renderLifeCalendar();
       }
@@ -260,6 +524,12 @@ const WritingEntry = (function() {
   function reset() {
     input.value = '';
     resetHeight();
+
+    // 重置状态
+    customTime = null;
+    selectedWeather = '';
+    updateTime();
+    updateWeatherIcon();
 
     // 延迟失焦，让用户看到提交成功的反馈
     setTimeout(() => {

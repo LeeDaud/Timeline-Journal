@@ -116,9 +116,18 @@
             data-max-rows="12"
           ></textarea>
 
-          <!-- 底部栏：时间 + 提交按钮 -->
+          <!-- 底部栏：时间 + 天气 + 提交按钮 -->
           <div class="writing-entry-footer">
-            <span class="writing-entry-time" id="writingEntryTime">--:--</span>
+            <!-- 时间（可点击编辑） -->
+            <button class="writing-entry-time-btn" id="writingEntryTimeBtn" aria-label="修改时间">
+              <span class="writing-entry-time" id="writingEntryTime">--:--</span>
+            </button>
+
+            <!-- 天气选择（小图标） -->
+            <button class="writing-entry-weather-btn" id="writingEntryWeatherBtn" aria-label="选择天气">
+              <span class="weather-icon-mini" id="writingEntryWeatherIcon"></span>
+            </button>
+
             <button class="writing-entry-submit" id="writingEntrySubmit" aria-label="保存">
               <!-- 自定义图标：assets/icons/icon.svg -->
               <img class="submit-icon-custom" src="assets/icons/icon.svg" alt="保存" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">

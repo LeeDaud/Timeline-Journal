@@ -1,6 +1,6 @@
 {
-  "name": "日迹",
-  "short_name": "日迹",
+  "name": "时间轴日记",
+  "short_name": "时间轴日记",
   "description": "极简时间轴日记",
   "start_url": "/",
   "display": "standalone",

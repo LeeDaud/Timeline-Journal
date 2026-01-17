@@ -1,4 +1,4 @@
-# 日迹 - Timeline Journal
+# 时间轴日记 - Timeline Journal
 
 > 一款极简风格的时间轴日记应用，专注于记录生命中的每一刻。
 
@@ -8,7 +8,7 @@
 ## 预览
 
 <!-- 添加你的截图 -->
-<!-- ![日迹预览](screenshots/preview.png) -->
+<!-- ![时间轴日记预览](screenshots/preview.png) -->
 
 ## 设计理念
 
@@ -215,4 +215,4 @@ location.reload();
 
 ---
 
-**用时间记录生命，用日迹见证成长。**
+**用时间记录生命，用日记见证成长。**

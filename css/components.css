@@ -4014,3 +4014,370 @@
     border-color: rgba(255, 255, 255, 0.12);
   }
 }
+
+/* ========================================
+   Wheel Picker - 统一滚轮选择器
+   ======================================== */
+
+/* Picker 卡片容器 */
+.picker-card {
+  position: fixed;
+  z-index: 500;
+  background-color: var(--color-bg-elevated-2, #1a1d21);
+  border-radius: 12px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  min-width: 200px;
+
+  /* 入场动画 */
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity 200ms ease, transform 200ms ease;
+  pointer-events: none;
+}
+
+.picker-card--active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.picker-card--date {
+  min-width: 260px;
+}
+
+.picker-card--time {
+  min-width: 180px;
+}
+
+/* Picker 头部 */
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.picker-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #9ba5a8);
+  font-variant-numeric: tabular-nums;
+}
+
+.picker-close {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--color-text-tertiary, #6e6860);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1;
+}
+
+.picker-close:hover {
+  color: var(--color-text-secondary);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 滚轮区域 */
+.picker-wheels {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  gap: 4px;
+}
+
+/* 时间模式分隔符 */
+.picker-separator {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-text-tertiary, #6e6860);
+  padding: 0 4px;
+  user-select: none;
+}
+
+/* 单列滚轮 */
+.wheel-column {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.wheel-viewport {
+  position: relative;
+  height: 108px; /* 36px * 3 行 */
+  width: 56px;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.wheel-viewport:active {
+  cursor: grabbing;
+}
+
+.wheel-content {
+  position: absolute;
+  top: 36px; /* 偏移一行，让选中项在中间 */
+  left: 0;
+  right: 0;
+  will-change: transform;
+}
+
+.wheel-item {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-tertiary, #6e6860);
+  transition: color 150ms ease, opacity 150ms ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.wheel-item:hover {
+  color: var(--color-text-secondary);
+}
+
+.wheel-item--selected {
+  color: var(--color-text-primary, #e8e0d5);
+  font-weight: 500;
+}
+
+/* 选中带（中线高亮） */
+.wheel-highlight {
+  position: absolute;
+  top: 36px;
+  left: 2px;
+  right: 2px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* 渐隐遮罩 */
+.wheel-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 36px;
+  pointer-events: none;
+}
+
+.wheel-mask--top {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--color-bg-elevated-2, #1a1d21) 0%,
+    rgba(26, 29, 33, 0.6) 60%,
+    transparent 100%
+  );
+}
+
+.wheel-mask--bottom {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    var(--color-bg-elevated-2, #1a1d21) 0%,
+    rgba(26, 29, 33, 0.6) 60%,
+    transparent 100%
+  );
+}
+
+/* 列标签（年/月/日） */
+.wheel-label {
+  font-size: 12px;
+  color: var(--color-text-tertiary, #6e6860);
+  margin-left: 2px;
+  user-select: none;
+}
+
+/* Picker 底部 */
+.picker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* 快捷按钮（今天/现在） */
+.picker-quick {
+  font-size: 12px;
+  color: var(--color-text-tertiary, #6e6860);
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.picker-quick:hover {
+  color: var(--color-text-secondary);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* 确认按钮 */
+.picker-confirm {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.picker-confirm svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary, #9ba5a8);
+  transition: color var(--transition-fast);
+}
+
+.picker-confirm:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.picker-confirm:hover svg {
+  color: var(--color-text-primary);
+}
+
+.picker-confirm:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+   Wheel Picker - 浅色模式
+   ======================================== */
+
+:root:not([data-theme="dark"]) .picker-card {
+  background-color: rgba(255, 255, 255, 0.98);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+:root:not([data-theme="dark"]) .picker-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+:root:not([data-theme="dark"]) .picker-title {
+  color: var(--color-text-secondary);
+}
+
+:root:not([data-theme="dark"]) .picker-close:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+:root:not([data-theme="dark"]) .picker-separator {
+  color: var(--color-text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .wheel-item {
+  color: var(--color-text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .wheel-item:hover {
+  color: var(--color-text-secondary);
+}
+
+:root:not([data-theme="dark"]) .wheel-item--selected {
+  color: var(--color-text-primary);
+}
+
+:root:not([data-theme="dark"]) .wheel-highlight {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+:root:not([data-theme="dark"]) .wheel-mask--top {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.6) 60%,
+    transparent 100%
+  );
+}
+
+:root:not([data-theme="dark"]) .wheel-mask--bottom {
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.6) 60%,
+    transparent 100%
+  );
+}
+
+:root:not([data-theme="dark"]) .wheel-label {
+  color: var(--color-text-tertiary);
+}
+
+:root:not([data-theme="dark"]) .picker-footer {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+:root:not([data-theme="dark"]) .picker-quick:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+:root:not([data-theme="dark"]) .picker-confirm {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.10);
+}
+
+:root:not([data-theme="dark"]) .picker-confirm:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+:root:not([data-theme="dark"]) .picker-confirm svg {
+  color: var(--color-text-secondary);
+}
+
+:root:not([data-theme="dark"]) .picker-confirm:hover svg {
+  color: var(--color-text-primary);
+}
+
+/* 深色模式媒体查询内的样式 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .wheel-mask--top {
+    background: linear-gradient(
+      to bottom,
+      var(--color-bg-elevated-2, #1a1d21) 0%,
+      rgba(26, 29, 33, 0.6) 60%,
+      transparent 100%
+    );
+  }
+
+  :root:not([data-theme="light"]) .wheel-mask--bottom {
+    background: linear-gradient(
+      to top,
+      var(--color-bg-elevated-2, #1a1d21) 0%,
+      rgba(26, 29, 33, 0.6) 60%,
+      transparent 100%
+    );
+  }
+}

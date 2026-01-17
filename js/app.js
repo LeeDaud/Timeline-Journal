@@ -1640,10 +1640,6 @@ const DiaryApp = (function() {
    * ========================================
    */
 
-  let dateJumpPopover = null;
-  let currentJumpYear = null;
-  let currentJumpMonth = null;
-
   /**
    * 绑定日期跳转按钮事件
    */
@@ -1652,198 +1648,23 @@ const DiaryApp = (function() {
     if (jumpBtn) {
       jumpBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        toggleDateJumpPopover(jumpBtn);
+        showDateJumpPicker(jumpBtn);
       });
     }
   }
 
   /**
-   * 切换日期跳转 popover 显示状态
+   * 显示日期跳转 Wheel Picker
    */
-  function toggleDateJumpPopover(anchorEl) {
-    if (dateJumpPopover) {
-      closeDateJumpPopover();
-      return;
-    }
-    showDateJumpPopover(anchorEl);
-  }
-
-  /**
-   * 显示日期跳转 popover（自定义日历）
-   */
-  function showDateJumpPopover(anchorEl) {
-    const today = new Date();
-    currentJumpYear = today.getFullYear();
-    currentJumpMonth = today.getMonth();
-
-    const popover = document.createElement('div');
-    popover.className = 'date-jump-popover';
-    popover.id = 'dateJumpPopover';
-
-    popover.innerHTML = generateCalendarHTML(currentJumpYear, currentJumpMonth);
-
-    // 定位 popover
-    const calendar = document.querySelector('.life-calendar');
-    const calendarRect = calendar ? calendar.getBoundingClientRect() : { left: 16, width: 280 };
-    const rect = anchorEl.getBoundingClientRect();
-
-    popover.style.position = 'fixed';
-    popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-    popover.style.left = calendarRect.left + 'px';
-    popover.style.width = Math.min(calendarRect.width, 280) + 'px';
-
-    document.body.appendChild(popover);
-    dateJumpPopover = popover;
-
-    bindCalendarEvents(popover);
-
-    // 延迟激活动画
-    setTimeout(() => popover.classList.add('active'), 10);
-  }
-
-  /**
-   * 生成日历 HTML
-   */
-  function generateCalendarHTML(year, month) {
-    const today = new Date();
-    const todayKey = DiaryModels.formatDateKey(today);
-
-    const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-    const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
-
-    // 月份第一天和最后一天
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const startWeekday = firstDay.getDay();
-    const daysInMonth = lastDay.getDate();
-
-    // 上个月填充
-    const prevMonthLast = new Date(year, month, 0);
-    const prevMonthDays = prevMonthLast.getDate();
-
-    let daysHTML = '';
-
-    // 上月填充天
-    for (let i = startWeekday - 1; i >= 0; i--) {
-      const day = prevMonthDays - i;
-      const dateKey = DiaryModels.formatDateKey(new Date(year, month - 1, day));
-      daysHTML += `<button class="cal-day cal-day--other" data-date="${dateKey}">${day}</button>`;
-    }
-
-    // 当月天数
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month, day);
-      const dateKey = DiaryModels.formatDateKey(date);
-      const isToday = dateKey === todayKey;
-      const isFuture = date > today;
-
-      let classes = ['cal-day'];
-      if (isToday) classes.push('cal-day--today');
-      if (isFuture) classes.push('cal-day--future');
-
-      daysHTML += `<button class="${classes.join(' ')}" data-date="${dateKey}" ${isFuture ? 'disabled' : ''}>${day}</button>`;
-    }
-
-    // 下月填充天（补满6行）
-    const totalCells = startWeekday + daysInMonth;
-    const remainingCells = (7 - (totalCells % 7)) % 7;
-    for (let day = 1; day <= remainingCells; day++) {
-      const dateKey = DiaryModels.formatDateKey(new Date(year, month + 1, day));
-      const isFuture = new Date(year, month + 1, day) > today;
-      daysHTML += `<button class="cal-day cal-day--other ${isFuture ? 'cal-day--future' : ''}" data-date="${dateKey}" ${isFuture ? 'disabled' : ''}>${day}</button>`;
-    }
-
-    // 周头
-    const weekHeaderHTML = weekDays.map(d => `<span class="cal-weekday">${d}</span>`).join('');
-
-    // 判断是否能切换到上/下月
-    const canPrev = true;
-    const canNext = !(year === today.getFullYear() && month === today.getMonth());
-
-    return `
-      <div class="cal-header">
-        <button class="cal-nav cal-nav--prev" ${canPrev ? '' : 'disabled'}>&lt;</button>
-        <span class="cal-title">${year}年${monthNames[month]}</span>
-        <button class="cal-nav cal-nav--next" ${canNext ? 'disabled' : ''}>&gt;</button>
-      </div>
-      <div class="cal-weekdays">${weekHeaderHTML}</div>
-      <div class="cal-days">${daysHTML}</div>
-      <div class="cal-footer">
-        <button class="cal-today-btn">今天</button>
-      </div>
-    `;
-  }
-
-  /**
-   * 绑定日历内部事件
-   */
-  function bindCalendarEvents(popover) {
-    // 日期点击 - 立即跳转
-    popover.addEventListener('click', (e) => {
-      const dayBtn = e.target.closest('.cal-day');
-      if (dayBtn && !dayBtn.disabled) {
-        const dateKey = dayBtn.dataset.date;
-        if (dateKey) {
-          handleDateJump(dateKey);
-          closeDateJumpPopover();
-        }
-        return;
-      }
-
-      // 上一月
-      if (e.target.closest('.cal-nav--prev')) {
-        currentJumpMonth--;
-        if (currentJumpMonth < 0) {
-          currentJumpMonth = 11;
-          currentJumpYear--;
-        }
-        updateCalendarContent(popover);
-        return;
-      }
-
-      // 下一月
-      if (e.target.closest('.cal-nav--next') && !e.target.closest('.cal-nav--next').disabled) {
-        currentJumpMonth++;
-        if (currentJumpMonth > 11) {
-          currentJumpMonth = 0;
-          currentJumpYear++;
-        }
-        updateCalendarContent(popover);
-        return;
-      }
-
-      // 今天按钮
-      if (e.target.closest('.cal-today-btn')) {
-        const today = new Date();
-        const todayKey = DiaryModels.formatDateKey(today);
-        handleDateJump(todayKey);
-        closeDateJumpPopover();
-        return;
+  function showDateJumpPicker(anchorEl) {
+    WheelPicker.openDatePicker({
+      value: new Date(),
+      anchor: anchorEl,
+      onConfirm: (date) => {
+        const dateKey = DiaryModels.formatDateKey(date);
+        handleDateJump(dateKey);
       }
     });
-  }
-
-  /**
-   * 更新日历内容（月份切换）
-   */
-  function updateCalendarContent(popover) {
-    popover.innerHTML = generateCalendarHTML(currentJumpYear, currentJumpMonth);
-    bindCalendarEvents(popover);
-  }
-
-  /**
-   * 关闭日期跳转 popover
-   */
-  function closeDateJumpPopover() {
-    if (dateJumpPopover) {
-      dateJumpPopover.classList.remove('active');
-      setTimeout(() => {
-        if (dateJumpPopover && dateJumpPopover.parentNode) {
-          dateJumpPopover.parentNode.removeChild(dateJumpPopover);
-        }
-        dateJumpPopover = null;
-      }, 150);
-    }
   }
 
   /**
@@ -2139,14 +1960,6 @@ const DiaryApp = (function() {
    * 关闭所有 popover（点击外部时）
    */
   function closeAllPopovers(event) {
-    // 日期跳转 popover
-    if (dateJumpPopover && !dateJumpPopover.contains(event.target)) {
-      const jumpBtn = document.getElementById('calendarJumpBtn');
-      if (!jumpBtn || !jumpBtn.contains(event.target)) {
-        closeDateJumpPopover();
-      }
-    }
-
     // 范围设置 popover
     if (rangeSettingsPopover && !rangeSettingsPopover.contains(event.target)) {
       const rangeBtn = document.getElementById('calendarRangeBtn');

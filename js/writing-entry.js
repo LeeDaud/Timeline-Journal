@@ -18,7 +18,6 @@ const WritingEntry = (function() {
   // 状态
   let customTime = null;       // 自定义时间 (HH:mm)，null 表示使用当前时间
   let selectedWeather = '';    // 选中的天气类型
-  let timePopover = null;
   let weatherPopover = null;
 
   // 天气配置（文字极简风格）
@@ -89,7 +88,7 @@ const WritingEntry = (function() {
       timeBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        toggleTimePopover();
+        showTimePicker();
       });
     }
 
@@ -148,90 +147,31 @@ const WritingEntry = (function() {
 
   /**
    * ========================================
-   * 时间编辑 Popover
+   * 时间编辑 - 使用 Wheel Picker
    * ========================================
    */
 
-  function toggleTimePopover() {
-    if (timePopover) {
-      closeTimePopover();
-      return;
-    }
-    showTimePopover();
-  }
-
-  function showTimePopover() {
+  function showTimePicker() {
     closeWeatherPopover();
 
-    const popover = document.createElement('div');
-    popover.className = 'time-edit-popover';
-    popover.id = 'timeEditPopover';
+    // 解析当前时间
+    let hour = new Date().getHours();
+    let minute = new Date().getMinutes();
 
-    const currentTime = customTime || timeDisplay.textContent;
-
-    popover.innerHTML = `
-      <div class="time-edit-content">
-        <input type="time"
-               class="time-edit-input"
-               id="timeEditInput"
-               value="${currentTime}">
-        <button class="time-edit-now" id="timeEditNow">现在</button>
-      </div>
-    `;
-
-    // 定位
-    const rect = timeBtn.getBoundingClientRect();
-    popover.style.position = 'fixed';
-    popover.style.bottom = (window.innerHeight - rect.top + 8) + 'px';
-    popover.style.left = rect.left + 'px';
-
-    document.body.appendChild(popover);
-    timePopover = popover;
-
-    // 绑定事件
-    const timeInput = popover.querySelector('#timeEditInput');
-    const nowBtn = popover.querySelector('#timeEditNow');
-
-    timeInput.addEventListener('change', () => {
-      customTime = timeInput.value;
-      updateTime();
-    });
-
-    timeInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        customTime = timeInput.value;
-        updateTime();
-        closeTimePopover();
-      }
-      if (e.key === 'Escape') {
-        closeTimePopover();
-      }
-    });
-
-    nowBtn.addEventListener('click', () => {
-      customTime = null;
-      updateTime();
-      closeTimePopover();
-    });
-
-    // 延迟激活动画
-    setTimeout(() => {
-      popover.classList.add('active');
-      timeInput.focus();
-      timeInput.select();
-    }, 10);
-  }
-
-  function closeTimePopover() {
-    if (timePopover) {
-      timePopover.classList.remove('active');
-      setTimeout(() => {
-        if (timePopover && timePopover.parentNode) {
-          timePopover.parentNode.removeChild(timePopover);
-        }
-        timePopover = null;
-      }, 150);
+    if (customTime) {
+      const parts = customTime.split(':');
+      hour = parseInt(parts[0]) || 0;
+      minute = parseInt(parts[1]) || 0;
     }
+
+    WheelPicker.openTimePicker({
+      value: { hour, minute },
+      anchor: timeBtn,
+      onConfirm: (time) => {
+        customTime = String(time.hour).padStart(2, '0') + ':' + String(time.minute).padStart(2, '0');
+        updateTime();
+      }
+    });
   }
 
   /**
@@ -249,7 +189,7 @@ const WritingEntry = (function() {
   }
 
   function showWeatherPopover() {
-    closeTimePopover();
+    WheelPicker.close();  // 关闭可能打开的时间选择器
 
     const popover = document.createElement('div');
     popover.className = 'weather-select-popover';
@@ -324,10 +264,6 @@ const WritingEntry = (function() {
    * 关闭所有 popover
    */
   function closeAllPopovers(e) {
-    // 时间 popover
-    if (timePopover && !timePopover.contains(e.target) && !timeBtn.contains(e.target)) {
-      closeTimePopover();
-    }
     // 天气 popover
     if (weatherPopover && !weatherPopover.contains(e.target) && !weatherBtn.contains(e.target)) {
       closeWeatherPopover();

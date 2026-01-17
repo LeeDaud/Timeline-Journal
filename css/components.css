@@ -1057,6 +1057,7 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-sizing: border-box;
   opacity: 1 !important;  /* 今天始终全亮 */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);  /* 内发光增强锚点感 */
 }
 
 /* 今天 + 有记录 */
@@ -1077,8 +1078,17 @@
   position: relative;
 }
 
+/* active 非 today：添加外发光增强焦点感 */
+.calendar-day--active:not(.calendar-day--today) {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
 .calendar-day--active.calendar-day--recorded {
   background-color: rgba(0, 0, 0, 0.35);
+}
+
+.calendar-day--active.calendar-day--recorded:not(.calendar-day--today) {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
 .calendar-day--today.calendar-day--active {
@@ -1823,6 +1833,7 @@
   .calendar-day--today {
     background-color: var(--color-text-primary);  /* 暖白色 */
     border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);  /* 内发光增强锚点感 */
   }
 
   .calendar-day--today.calendar-day--recorded {
@@ -1839,8 +1850,17 @@
     background-color: rgba(255, 255, 255, 0.35);
   }
 
+  /* active 非 today：添加外发光增强焦点感 */
+  .calendar-day--active:not(.calendar-day--today) {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+
   .calendar-day--active.calendar-day--recorded {
     background-color: rgba(255, 255, 255, 0.40);
+  }
+
+  .calendar-day--active.calendar-day--recorded:not(.calendar-day--today) {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
   }
 
   .calendar-day--today.calendar-day--active {
@@ -2125,6 +2145,7 @@
   .calendar-day--today {
     background-color: var(--color-text-primary);
     border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);  /* 内发光增强锚点感 */
   }
 
   .calendar-day--today.calendar-day--recorded {
@@ -2139,8 +2160,17 @@
     background-color: rgba(255, 255, 255, 0.35);
   }
 
+  /* active 非 today：添加外发光增强焦点感 */
+  .calendar-day--active:not(.calendar-day--today) {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+
   .calendar-day--active.calendar-day--recorded {
     background-color: rgba(255, 255, 255, 0.40);
+  }
+
+  .calendar-day--active.calendar-day--recorded:not(.calendar-day--today) {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
   }
 
   .calendar-day--today.calendar-day--active {
@@ -2312,6 +2342,7 @@
   .calendar-day--today {
     background-color: var(--color-text-primary) !important;
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15) !important;  /* 内发光增强锚点感 */
   }
 
   .calendar-day--today.calendar-day--recorded {
@@ -2326,8 +2357,17 @@
     background-color: rgba(0, 0, 0, 0.30) !important;
   }
 
+  /* active 非 today：添加外发光增强焦点感 */
+  .calendar-day--active:not(.calendar-day--today) {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2) !important;
+  }
+
   .calendar-day--active.calendar-day--recorded {
     background-color: rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .calendar-day--active.calendar-day--recorded:not(.calendar-day--today) {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) !important;
   }
 
   .calendar-day--today.calendar-day--active {

@@ -182,16 +182,32 @@ const DiaryModels = (function() {
    * @param {string} birthDate
    * @param {number} age
    * @returns {object} { start: Date, end: Date }
+   *
+   * 注意：正确处理闰年生日（2月29日）
+   * - 非闰年时，2月29日会被 JS 自动进位到3月1日
+   * - 此函数会将其修正为2月28日，保持在同月
    */
   function getAgeRange(birthDate, age) {
     const birth = new Date(birthDate);
+    const birthMonth = birth.getMonth();
+    const birthDay = birth.getDate();
 
-    const start = new Date(birth);
-    start.setFullYear(birth.getFullYear() + age);
+    const startYear = birth.getFullYear() + age;
+    const endYear = startYear + 1;
 
-    const end = new Date(start);
-    end.setFullYear(end.getFullYear() + 1);
-    end.setDate(end.getDate() - 1);  // 减1天，到下个生日前一天
+    // 构建起始日期（第 N 次生日）
+    const start = new Date(startYear, birthMonth, birthDay);
+    // 如果日期溢出（闰年2月29日在非闰年会变成3月1日），修正为当月最后一天
+    if (start.getMonth() !== birthMonth) {
+      start.setDate(0);  // 回到上月最后一天（即2月28日）
+    }
+
+    // 构建结束日期（第 N+1 次生日前一天）
+    const end = new Date(endYear, birthMonth, birthDay);
+    if (end.getMonth() !== birthMonth) {
+      end.setDate(0);  // 修正闰年问题
+    }
+    end.setDate(end.getDate() - 1);  // 前一天
 
     return { start, end };
   }

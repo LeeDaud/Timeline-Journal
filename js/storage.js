@@ -23,7 +23,8 @@ const DiaryStorage = (function() {
         fontSize: 'medium',
         lastSyncAt: null,
         birthDate: null,      // 出生日期（时间原点）'YYYY-MM-DD'
-        initialized: false    // 是否已初始化出生日期
+        initialized: false,   // 是否已初始化出生日期
+        calendarRange: 'default'  // 生命日历展示范围：'compact' | 'default' | 'extended' | 'all'
       },
       version: VERSION
     };
@@ -189,6 +190,34 @@ const DiaryStorage = (function() {
   }
 
   /**
+   * 获取生命日历展示范围
+   * @returns {string} 'compact' | 'default' | 'extended' | 'all'
+   */
+  function getCalendarRange() {
+    const data = loadData();
+    return data.settings?.calendarRange || 'default';
+  }
+
+  /**
+   * 设置生命日历展示范围
+   * @param {string} range - 'compact' | 'default' | 'extended' | 'all'
+   */
+  function setCalendarRange(range) {
+    const validRanges = ['compact', 'default', 'extended', 'all'];
+    if (!validRanges.includes(range)) {
+      console.warn('⚠️ 无效的展示范围:', range);
+      return;
+    }
+
+    const data = loadData();
+    if (!data.settings) {
+      data.settings = getInitialData().settings;
+    }
+    data.settings.calendarRange = range;
+    saveData(data);
+  }
+
+  /**
    * 获取某天的特殊日期标记
    * @param {string} dateKey - 日期键 (YYYY-MM-DD)
    * @returns {object|null} 特殊日期对象或null
@@ -230,6 +259,8 @@ const DiaryStorage = (function() {
     setDailyWeather,
     getBirthDate,
     setBirthDate,
+    getCalendarRange,
+    setCalendarRange,
     getMilestone,
     setMilestone
   };

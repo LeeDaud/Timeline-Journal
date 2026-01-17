@@ -376,9 +376,33 @@ const DiaryUI = (function() {
     // 计算当前年龄
     const currentAge = DiaryModels.getAge(birthDate);
 
-    // 生成最近两个年龄的日历数据（上一个年龄 + 当前年龄）
-    const startAge = Math.max(0, currentAge - 1);
-    const endAge = currentAge;
+    // 根据设置确定展示范围
+    const rangeConfig = DiaryStorage.getCalendarRange();
+    let startAge, endAge;
+
+    switch (rangeConfig) {
+      case 'compact':
+        // 紧凑：仅当前年龄
+        startAge = currentAge;
+        endAge = currentAge;
+        break;
+      case 'extended':
+        // 扩展：当前 + 前两年
+        startAge = Math.max(0, currentAge - 2);
+        endAge = currentAge;
+        break;
+      case 'all':
+        // 全部：从出生至今
+        startAge = 0;
+        endAge = currentAge;
+        break;
+      case 'default':
+      default:
+        // 默认：当前 + 上一年
+        startAge = Math.max(0, currentAge - 1);
+        endAge = currentAge;
+        break;
+    }
 
     // 获取所有记录
     const entries = DiaryStorage.getAllEntries();

@@ -7,6 +7,36 @@
   --color-bg-primary: #fafafa;        /* 主背景 */
   --color-bg-overlay: rgba(0, 0, 0, 0.4); /* 遮罩层 */
 
+  /* ========== 玻璃质感系统（浅色模式）========== */
+  /* glass-weak: 历史记录卡片 */
+  --glass-weak-bg: rgba(255, 255, 255, 0.6);
+  --glass-weak-bg-hover: rgba(255, 255, 255, 0.8);
+  --glass-weak-border: rgba(0, 0, 0, 0.04);
+  --glass-weak-border-hover: rgba(0, 0, 0, 0.08);
+  --glass-weak-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  --glass-weak-shadow-hover: 0 2px 12px rgba(0, 0, 0, 0.06);
+  --glass-weak-blur: 6px;
+
+  /* glass: 标准等级（弹出层、Picker）*/
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg-hover: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-border-hover: rgba(0, 0, 0, 0.10);
+  --glass-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  --glass-shadow-hover: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --glass-blur: 10px;
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+
+  /* glass-strong: 输入框（更"正在发生"）*/
+  --glass-strong-bg: rgba(255, 255, 255, 0.8);
+  --glass-strong-bg-hover: rgba(255, 255, 255, 0.9);
+  --glass-strong-border: rgba(0, 0, 0, 0.08);
+  --glass-strong-border-hover: rgba(0, 0, 0, 0.12);
+  --glass-strong-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+  --glass-strong-shadow-hover: 0 4px 28px rgba(0, 0, 0, 0.10);
+  --glass-strong-blur: 12px;
+  --glass-strong-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
   /* 字号 - 重新平衡叙事权重 */
   --font-size-content: 16px;          /* 内容文字（降低一档，不再是视觉中心）*/
   --font-size-time: 12px;             /* 时间戳（增强，成为时间叙事的锚点）*/
@@ -100,6 +130,36 @@
     --color-bg-elevated-2: #242629;     /* 二级抬升：编辑器背景 */
     --color-bg-overlay: rgba(0, 0, 0, 0.85); /* 遮罩层：更深，增强聚焦感 */
 
+    /* ========== 玻璃质感系统（Glassmorphism）========== */
+    /* glass-weak: 历史记录卡片（雾面、不抢戏）*/
+    --glass-weak-bg: rgba(255, 255, 255, 0.02);
+    --glass-weak-bg-hover: rgba(255, 255, 255, 0.04);
+    --glass-weak-border: rgba(255, 255, 255, 0.04);
+    --glass-weak-border-hover: rgba(255, 255, 255, 0.08);
+    --glass-weak-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+    --glass-weak-shadow-hover: 0 2px 12px rgba(0, 0, 0, 0.10);
+    --glass-weak-blur: 6px;
+
+    /* glass: 标准等级（弹出层、Picker）*/
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-bg-hover: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-border-hover: rgba(255, 255, 255, 0.10);
+    --glass-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+    --glass-shadow-hover: 0 4px 24px rgba(0, 0, 0, 0.12);
+    --glass-blur: 10px;
+    --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+    /* glass-strong: 输入框（更"正在发生"）*/
+    --glass-strong-bg: rgba(255, 255, 255, 0.04);
+    --glass-strong-bg-hover: rgba(255, 255, 255, 0.06);
+    --glass-strong-border: rgba(255, 255, 255, 0.08);
+    --glass-strong-border-hover: rgba(255, 255, 255, 0.14);
+    --glass-strong-shadow: 0 2px 20px rgba(0, 0, 0, 0.10);
+    --glass-strong-shadow-hover: 0 4px 28px rgba(0, 0, 0, 0.14);
+    --glass-strong-blur: 12px;
+    --glass-strong-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
     /* ========== 文字层级（暖色调，模拟烛光/台灯）========== */
     --color-text-primary: #e8e0d5;      /* 主文字：略带米色的白（92% 亮度）*/
     --color-text-secondary: #9ba5a8;    /* 次要文字：冷灰（时间戳）- 统一色温 */
@@ -160,6 +220,36 @@
   --color-bg-elevated-1: #181c20;     /* 一级抬升：时间轴内容区 */
   --color-bg-elevated-2: #242629;     /* 二级抬升：编辑器背景 */
   --color-bg-overlay: rgba(0, 0, 0, 0.85); /* 遮罩层：更深，增强聚焦感 */
+
+  /* ========== 玻璃质感系统（Glassmorphism）========== */
+  /* glass-weak: 历史记录卡片（雾面、不抢戏）*/
+  --glass-weak-bg: rgba(255, 255, 255, 0.02);
+  --glass-weak-bg-hover: rgba(255, 255, 255, 0.04);
+  --glass-weak-border: rgba(255, 255, 255, 0.04);
+  --glass-weak-border-hover: rgba(255, 255, 255, 0.08);
+  --glass-weak-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+  --glass-weak-shadow-hover: 0 2px 12px rgba(0, 0, 0, 0.10);
+  --glass-weak-blur: 6px;
+
+  /* glass: 标准等级（弹出层、Picker）*/
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg-hover: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-border-hover: rgba(255, 255, 255, 0.10);
+  --glass-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --glass-shadow-hover: 0 4px 24px rgba(0, 0, 0, 0.12);
+  --glass-blur: 10px;
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* glass-strong: 输入框（更"正在发生"）*/
+  --glass-strong-bg: rgba(255, 255, 255, 0.04);
+  --glass-strong-bg-hover: rgba(255, 255, 255, 0.06);
+  --glass-strong-border: rgba(255, 255, 255, 0.08);
+  --glass-strong-border-hover: rgba(255, 255, 255, 0.14);
+  --glass-strong-shadow: 0 2px 20px rgba(0, 0, 0, 0.10);
+  --glass-strong-shadow-hover: 0 4px 28px rgba(0, 0, 0, 0.14);
+  --glass-strong-blur: 12px;
+  --glass-strong-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
   /* ========== 文字层级（暖色调，模拟烛光/台灯）========== */
   --color-text-primary: #e8e0d5;      /* 主文字：略带米色的白（92% 亮度）*/

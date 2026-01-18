@@ -395,18 +395,33 @@
   display: flex;
   margin-bottom: var(--entry-spacing-medium);  /* 默认中等间距 */
   cursor: pointer;
-  transition: background-color var(--transition-slow);
-  padding: 10px 0;                   /* 增加上下留白 */
-  margin-left: -12px;                /* 扩大点击区域 */
-  margin-right: -12px;
-  padding-left: 12px;
-  padding-right: 12px;
-  border-radius: 6px;                /* 略微增加圆角 */
   position: relative;
+
+  /* 统一的卡片布局 */
+  padding: 12px 16px;
+  margin-left: -16px;
+  margin-right: -16px;
+  border-radius: 10px;
+  box-sizing: border-box;
+
+  /* glass-weak 玻璃质感（雾面，不抢戏）*/
+  background-color: var(--glass-weak-bg);
+  backdrop-filter: blur(var(--glass-weak-blur));
+  -webkit-backdrop-filter: blur(var(--glass-weak-blur));
+  border: 1px solid var(--glass-weak-border);
+  box-shadow: var(--glass-weak-shadow);
+
+  /* 过渡：仅改变颜色/透明度/阴影，不改变尺寸 */
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
 }
 
 .entry-item:hover {
-  background-color: var(--hover-bg);
+  background-color: var(--glass-weak-bg-hover);
+  border-color: var(--glass-weak-border-hover);
+  box-shadow: var(--glass-weak-shadow-hover);
 }
 
 /* 垂直时间线 - 贯穿整个记录 */
@@ -432,13 +447,13 @@
   border-radius: 50%;
   background: var(--color-text-secondary);
   opacity: 0.35;                     /* 从 0.25 增加到 0.35 */
-  transition: all var(--transition-normal);
+  transition: opacity var(--transition-normal);
   pointer-events: none;
 }
 
 .entry-item:hover::after {
-  opacity: 0.55;
-  transform: scale(1.2);
+  opacity: 0.6;
+  /* 不使用 scale，保持尺寸稳定 */
 }
 
 /* 首条记录：额外上方间距 */
@@ -2616,7 +2631,7 @@
   pointer-events: none;
 }
 
-/* 输入区域 - 玻璃质感书写空间 */
+/* 输入区域 - glass-strong 玻璃质感书写空间 */
 .writing-entry-input {
   width: 100%;
   min-height: 96px;  /* 约三行高度 */
@@ -2624,17 +2639,16 @@
   padding: 16px 20px;
   padding-bottom: 56px;  /* 增加底部空间，为底部栏留出更多距离 */
 
-  /* 玻璃质感：半透明 + 模糊 */
-  background-color: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  /* glass-strong 玻璃质感（更"正在发生"）*/
+  background-color: var(--glass-strong-bg);
+  backdrop-filter: blur(var(--glass-strong-blur));
+  -webkit-backdrop-filter: blur(var(--glass-strong-blur));
+  border: 1px solid var(--glass-strong-border);
+  box-shadow: var(--glass-strong-shadow), var(--glass-strong-inset);
   color: var(--color-text-primary);
 
-  /* 柔和圆角 */
-  border-radius: 12px;
+  /* 统一圆角（与记录卡片一致） */
+  border-radius: 10px;
 
   /* 字体 */
   font-size: var(--font-size-content);
@@ -2648,11 +2662,12 @@
   box-sizing: border-box;
   overflow-y: hidden;
 
-  /* 过渡 */
-  transition: background-color var(--transition-normal),
-              border-color var(--transition-normal),
-              box-shadow var(--transition-normal),
-              height 150ms ease;
+  /* 过渡：仅改变颜色/透明度/阴影，不改变尺寸 */
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    height 150ms ease;
 }
 
 /* Placeholder 样式 - 更淡，暗示可书写 */
@@ -2664,10 +2679,9 @@
 
 /* 聚焦状态 - 玻璃质感增强 */
 .writing-entry-input:focus {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12),
-              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background-color: var(--glass-strong-bg-hover);
+  border-color: var(--glass-strong-border-hover);
+  box-shadow: var(--glass-strong-shadow-hover), var(--glass-strong-inset);
 }
 
 /* 底部栏：时间 + 保存按钮 */
@@ -3048,27 +3062,28 @@
 .popover {
   position: fixed;
   z-index: 350;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
-              0 2px 8px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.06);
   padding: 12px;
   min-width: 240px;
   max-width: 320px;
 
-  /* 入场动画 */
+  /* glass 玻璃质感（标准等级）*/
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+
+  /* 入场动画：仅 opacity + translateY，不使用 scale */
   opacity: 0;
-  transform: translateY(-8px) scale(0.98);
+  transform: translateY(-6px);
   transition: opacity 150ms ease, transform 150ms ease;
   pointer-events: none;
 }
 
 .popover.active {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
   pointer-events: auto;
 }
 
@@ -3669,23 +3684,26 @@
 .weather-select-popover {
   position: fixed;
   z-index: 400;
-  background-color: var(--color-bg-elevated-2, #1a1d21);
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
-              0 2px 8px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 8px;
 
-  /* 入场动画 */
+  /* glass 玻璃质感（标准等级）*/
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+
+  /* 入场动画：仅 opacity + translateY，不使用 scale */
   opacity: 0;
-  transform: translateY(8px) scale(0.98);
+  transform: translateY(6px);
   transition: opacity 150ms ease, transform 150ms ease;
   pointer-events: none;
 }
 
 .weather-select-popover.active {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
   pointer-events: auto;
 }
 
@@ -4019,29 +4037,31 @@
    Wheel Picker - 统一滚轮选择器
    ======================================== */
 
-/* Picker 卡片容器 */
+/* Picker 卡片容器 - glass 标准等级 */
 .picker-card {
   position: fixed;
   z-index: 500;
-  background-color: var(--color-bg-elevated-2, #1a1d21);
-  border-radius: 12px;
-  box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.5),
-    0 4px 12px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
   min-width: 200px;
 
-  /* 入场动画 */
+  /* glass 玻璃质感（标准等级）*/
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+
+  /* 入场动画：仅 opacity + translateY，不使用 scale */
   opacity: 0;
-  transform: translateY(8px) scale(0.96);
+  transform: translateY(6px);
   transition: opacity 200ms ease, transform 200ms ease;
   pointer-events: none;
 }
 
 .picker-card--active {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
   pointer-events: auto;
 }
 
@@ -4059,7 +4079,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .picker-title {
@@ -4214,7 +4234,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--glass-border);
 }
 
 /* 快捷按钮（今天/现在） */

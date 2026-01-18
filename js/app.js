@@ -246,11 +246,11 @@ const DiaryApp = (function() {
    * @param {Event} event - 鼠标悬停事件
    */
   function handleTimelineHover(event) {
-    // 查找最近的日期分组
-    const dateGroup = event.target.closest('.date-group');
-    if (!dateGroup) return;
+    // 查找最近的带日期的 timeline-row
+    const timelineRow = event.target.closest('.timeline-row[data-date]');
+    if (!timelineRow) return;
 
-    const dateKey = dateGroup.dataset.date;
+    const dateKey = timelineRow.dataset.date;
     if (!dateKey) return;
 
     // 防止频繁触发：使用防抖
@@ -274,8 +274,8 @@ const DiaryApp = (function() {
       return;
     }
 
-    // 处理记录点击
-    const entryElement = event.target.closest('.entry-item');
+    // 处理记录点击（新结构使用 .entry-card）
+    const entryElement = event.target.closest('.entry-card');
     if (entryElement) {
       handleEntryClick(entryElement);
     }
@@ -429,9 +429,10 @@ const DiaryApp = (function() {
    * 初始化心理联动（左侧日历与中间时间轴的感知层联动）
    */
   function initPsychologicalSync() {
-    const dateGroups = document.querySelectorAll('.date-group');
-    if (!dateGroups || dateGroups.length === 0) {
-      console.log('⚠️ 没有找到日期分组，跳过心理联动初始化');
+    // 新结构：使用 timeline-row[data-date] 进行观察
+    const timelineRows = document.querySelectorAll('.timeline-row[data-date]');
+    if (!timelineRows || timelineRows.length === 0) {
+      console.log('⚠️ 没有找到时间轴行，跳过心理联动初始化');
       return;
     }
 
@@ -466,7 +467,7 @@ const DiaryApp = (function() {
       }
     );
 
-    dateGroups.forEach(group => observer.observe(group));
+    timelineRows.forEach(row => observer.observe(row));
     console.log('✅ 心理联动已启动');
   }
 
@@ -636,20 +637,23 @@ const DiaryApp = (function() {
    * @param {string} dateKey - 日期键 (YYYY-MM-DD)
    */
   function highlightTimelineDate(dateKey) {
-    // 移除之前的高亮
-    const previousActive = document.querySelector('.date-group--active');
+    // 移除之前的高亮（新结构使用 timeline-row--active）
+    const previousActive = document.querySelector('.timeline-row--active');
     if (previousActive) {
-      previousActive.classList.remove('date-group--active');
+      previousActive.classList.remove('timeline-row--active');
     }
 
-    // 查找对应的日期分组
-    const targetDateGroup = document.querySelector(`.date-group[data-date="${dateKey}"]`);
-    if (targetDateGroup) {
+    // 查找对应的日期行（优先找 DayMarker，其次找 Entry）
+    let targetRow = document.querySelector(`.timeline-row--day[data-date="${dateKey}"]`);
+    if (!targetRow) {
+      targetRow = document.querySelector(`.timeline-row--entry[data-date="${dateKey}"]`);
+    }
+    if (targetRow) {
       // 添加高亮
-      targetDateGroup.classList.add('date-group--active');
+      targetRow.classList.add('timeline-row--active');
 
       // 平滑滚动到该日期（如果不在视野中）
-      scrollTimelineToDate(targetDateGroup);
+      scrollTimelineToDate(targetRow);
     }
   }
 
@@ -705,14 +709,29 @@ const DiaryApp = (function() {
     // 更新时间锚点
     updateTimeAnchorFromDate(dateKey);
 
-    // 查找该日期是否有记录
-    const dateGroup = document.querySelector(`.date-group[data-date="${dateKey}"]`);
+    // 使用新的时间轴跳转
+    jumpToTimelineDate(dateKey);
+  }
 
-    if (dateGroup) {
-      // 有记录：滚动到该日期分组
-      scrollToDateGroup(dateGroup);
-    } else {
-      // 无记录：激活写作入口并设置目标日期（替代原来的弹窗）
+  /**
+   * 跳转到时间轴指定日期（新 Continuous Timeline Flow）
+   * @param {string} dateKey - 日期键 (YYYY-MM-DD)
+   */
+  function jumpToTimelineDate(dateKey) {
+    // 先尝试滚动到该日期
+    const found = DiaryUI.scrollToDate(dateKey);
+
+    if (!found) {
+      // 无记录：插入 ghost marker 并滚动
+      const ghostEl = DiaryUI.insertGhostDayMarker(dateKey);
+      if (ghostEl) {
+        setTimeout(() => {
+          ghostEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          ghostEl.classList.add('timeline-row--highlight');
+          setTimeout(() => ghostEl.classList.remove('timeline-row--highlight'), 2000);
+        }, 50);
+      }
+      // 激活写作入口
       activateWritingEntryWithDate(dateKey);
     }
   }
@@ -722,6 +741,15 @@ const DiaryApp = (function() {
    * @param {HTMLElement} dateGroup - 日期分组元素
    */
   function scrollToDateGroup(dateGroup) {
+    // 兼容新结构：如果是 timeline-row，提取 data-date 使用新方法
+    if (dateGroup.classList && dateGroup.classList.contains('timeline-row')) {
+      const dateKey = dateGroup.dataset.date;
+      if (dateKey) {
+        DiaryUI.scrollToDate(dateKey);
+        return;
+      }
+    }
+
     const rect = dateGroup.getBoundingClientRect();
     const currentScroll = window.pageYOffset;
 
@@ -1579,16 +1607,8 @@ const DiaryApp = (function() {
 
       // 延迟后跳转到指定日期
       setTimeout(() => {
-        // 查找该日期是否有记录
-        const dateGroup = document.querySelector(`.date-group[data-date="${dateKey}"]`);
-
-        if (dateGroup) {
-          // 有记录：滚动到该日期
-          scrollToDateGroup(dateGroup);
-        } else {
-          // 无记录：打开编辑器
-          scrollToEmptyDate(dateKey);
-        }
+        // 使用新的时间轴跳转
+        jumpToTimelineDate(dateKey);
       }, 400);
     }, 300);
   }
@@ -1598,19 +1618,10 @@ const DiaryApp = (function() {
    */
   function scrollToToday() {
     const today = DiaryModels.formatDateKey(new Date());
-    const todayGroup = document.querySelector(`.date-group[data-date="${today}"]`);
-
-    if (todayGroup) {
-      setTimeout(() => {
-        scrollToDateGroup(todayGroup);
-      }, 300);
-    } else {
-      // 没有今天的记录，滚动到时间轴顶部
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
+    // 使用新的时间轴跳转
+    setTimeout(() => {
+      jumpToTimelineDate(today);
+    }, 300);
   }
 
   /**
@@ -1680,15 +1691,8 @@ const DiaryApp = (function() {
     // 3. 更新时间锚点
     updateTimeAnchorFromDate(dateKey);
 
-    // 4. 检查时间轴是否有该日期的记录
-    const dateGroup = document.querySelector(`.date-group[data-date="${dateKey}"]`);
-    if (dateGroup) {
-      // 有记录：滚动到该日期
-      scrollToDateGroup(dateGroup);
-    } else {
-      // 无记录：激活写作入口并设置目标日期
-      activateWritingEntryWithDate(dateKey);
-    }
+    // 4. 使用新的时间轴跳转
+    jumpToTimelineDate(dateKey);
   }
 
   /**

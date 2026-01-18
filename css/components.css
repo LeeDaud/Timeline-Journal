@@ -4401,3 +4401,592 @@
     );
   }
 }
+
+
+/* ========================================
+   Continuous Timeline Flow
+   连续时间流布局系统
+   ======================================== */
+
+/* 时间轴脊柱位置变量 */
+:root {
+  --spine-left: 32px;           /* 脊柱距离左边距 */
+  --spine-width: 1px;           /* 脊柱线宽 */
+  --content-left: 48px;         /* 内容区距离左边距 */
+  --dot-size-year: 10px;        /* 年份圆点尺寸 */
+  --dot-size-month: 7px;        /* 月份圆点尺寸 */
+  --dot-size-day: 5px;          /* 日期圆点尺寸 */
+  --dot-size-entry: 4px;        /* 记录圆点尺寸 */
+}
+
+/* ----------------------------------------
+   TimelineRow 基础布局
+   所有行共享同一布局结构
+   ---------------------------------------- */
+.timeline-row {
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+  min-height: 24px;
+}
+
+/* 时间轴脊柱容器 */
+.timeline-spine {
+  position: absolute;
+  left: var(--spine-left);
+  top: 0;
+  bottom: 0;
+  width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 脊柱竖线（通过伪元素实现连续线） */
+.timeline-row::before {
+  content: '';
+  position: absolute;
+  left: var(--spine-left);
+  top: 0;
+  bottom: 0;
+  width: var(--spine-width);
+  background: var(--timeline-color);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* 首行：脊柱从圆点开始 */
+.timeline-row:first-child::before {
+  top: 12px;
+}
+
+/* 末行：脊柱到圆点结束 */
+.timeline-row:last-child::before {
+  bottom: auto;
+  height: 12px;
+}
+
+/* 时间轴圆点（基础样式） */
+.timeline-dot {
+  position: relative;
+  top: 8px;  /* 垂直居中偏移 */
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-text-tertiary);
+  opacity: 0.35;
+  z-index: 1;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* 内容区域 */
+.timeline-content {
+  margin-left: var(--content-left);
+  flex: 1;
+  min-width: 0;  /* 防止溢出 */
+}
+
+/* ----------------------------------------
+   Year Marker - 年份标记
+   双环圆点，最大留白
+   ---------------------------------------- */
+.timeline-row--year {
+  margin-top: 56px;
+  margin-bottom: 16px;
+  padding: 8px 0;
+}
+
+/* 首个年份不需要上方留白 */
+.timeline-row--year:first-child {
+  margin-top: 0;
+}
+
+/* 年份圆点：双环效果 */
+.timeline-dot--year {
+  width: var(--dot-size-year);
+  height: var(--dot-size-year);
+  background: transparent;
+  border: 2px solid var(--color-text-tertiary);
+  opacity: 0.4;
+  top: 4px;
+}
+
+/* 年份文字 */
+.marker-year {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  opacity: 0.6;
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----------------------------------------
+   Month Marker - 月份标记
+   中等圆点，中等留白
+   ---------------------------------------- */
+.timeline-row--month {
+  margin-top: 32px;
+  margin-bottom: 12px;
+  padding: 4px 0;
+}
+
+/* 如果月份紧跟年份，减少上方留白 */
+.timeline-row--year + .timeline-row--month {
+  margin-top: 8px;
+}
+
+/* 月份圆点 */
+.timeline-dot--month {
+  width: var(--dot-size-month);
+  height: var(--dot-size-month);
+  background: var(--color-text-tertiary);
+  opacity: 0.35;
+  top: 6px;
+}
+
+/* 月份文字 */
+.marker-month {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  letter-spacing: 1px;
+}
+
+/* 月份后的年份（辅助信息） */
+.marker-month-year {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.4;
+  margin-left: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* ----------------------------------------
+   Day Marker - 日期标记
+   小圆点，适度留白
+   ---------------------------------------- */
+.timeline-row--day {
+  margin-top: 18px;
+  margin-bottom: 8px;
+  padding: 2px 0;
+}
+
+/* 如果日期紧跟月份，减少上方留白 */
+.timeline-row--month + .timeline-row--day {
+  margin-top: 10px;
+}
+
+/* 同月内跨天：适度留白 */
+.timeline-row--entry + .timeline-row--day {
+  margin-top: 18px;
+}
+
+/* 日期圆点 */
+.timeline-dot--day {
+  width: var(--dot-size-day);
+  height: var(--dot-size-day);
+  background: var(--color-text-secondary);
+  opacity: 0.4;
+  top: 8px;
+}
+
+/* 今日圆点：高亮 */
+.timeline-dot--today {
+  background: var(--color-accent, #6366f1);
+  opacity: 0.8;
+  box-shadow: 0 0 6px rgba(99, 102, 241, 0.4);
+}
+
+/* 日期数字 */
+.marker-day {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 星期 */
+.marker-weekday {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+  opacity: 0.5;
+  margin-left: 6px;
+  letter-spacing: 0.5px;
+}
+
+/* 特殊日期徽章（生日、纪念日） */
+.marker-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  letter-spacing: 0.5px;
+}
+
+.marker-badge--birthday {
+  background: var(--glass-weak-bg);
+  border: 1px solid var(--color-birthday);
+  color: var(--color-birthday);
+  opacity: 0.8;
+}
+
+.marker-badge--anniversary {
+  background: var(--glass-weak-bg);
+  border: 1px solid var(--color-anniversary);
+  color: var(--color-anniversary);
+  opacity: 0.8;
+}
+
+/* 今日行高亮 */
+.timeline-row--today .marker-day {
+  color: var(--color-accent, #6366f1);
+  opacity: 1;
+  font-weight: 500;
+}
+
+.timeline-row--today .marker-weekday {
+  color: var(--color-accent, #6366f1);
+  opacity: 0.7;
+}
+
+/* 生日行 */
+.timeline-row--birthday {
+  margin-top: 40px;
+  margin-bottom: 12px;
+}
+
+.timeline-row--birthday .timeline-dot--day {
+  background: var(--color-birthday);
+  opacity: 0.8;
+  width: 6px;
+  height: 6px;
+}
+
+.timeline-row--birthday .marker-day {
+  color: var(--color-birthday);
+  opacity: 1;
+  font-weight: 500;
+}
+
+/* 纪念日行 */
+.timeline-row--anniversary {
+  margin-top: 24px;
+  margin-bottom: 10px;
+}
+
+.timeline-row--anniversary .timeline-dot--day {
+  background: var(--color-anniversary);
+  opacity: 0.7;
+}
+
+.timeline-row--anniversary .marker-day {
+  color: var(--color-anniversary);
+  opacity: 0.9;
+}
+
+/* ----------------------------------------
+   Entry Row - 记录行
+   最小圆点，紧凑间距
+   ---------------------------------------- */
+.timeline-row--entry {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+/* DayMarker 到第一条 Entry */
+.timeline-row--day + .timeline-row--entry {
+  margin-top: 10px;
+}
+
+/* Entry 之间 */
+.timeline-row--entry + .timeline-row--entry {
+  margin-top: 0;
+}
+
+/* 记录圆点 */
+.timeline-dot--entry {
+  width: var(--dot-size-entry);
+  height: var(--dot-size-entry);
+  background: var(--color-text-tertiary);
+  opacity: 0.25;
+  top: 20px;  /* 对齐卡片内时间戳 */
+}
+
+/* 悬停时圆点增强 */
+.timeline-row--entry:hover .timeline-dot--entry {
+  opacity: 0.5;
+}
+
+/* ----------------------------------------
+   Entry Card - 记录卡片
+   玻璃质感，替代原 .entry-item
+   ---------------------------------------- */
+.entry-card {
+  display: flex;
+  cursor: pointer;
+  position: relative;
+
+  /* 卡片布局 */
+  padding: 12px 16px;
+  border-radius: 10px;
+  box-sizing: border-box;
+
+  /* glass-weak 玻璃质感 */
+  background-color: var(--glass-weak-bg);
+  backdrop-filter: blur(var(--glass-weak-blur));
+  -webkit-backdrop-filter: blur(var(--glass-weak-blur));
+  border: 1px solid var(--glass-weak-border);
+  box-shadow: var(--glass-weak-shadow);
+
+  /* 过渡 */
+  transition:
+    background-color var(--transition-normal),
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.entry-card:hover {
+  background-color: var(--glass-weak-bg-hover);
+  border-color: var(--glass-weak-border-hover);
+  box-shadow: var(--glass-weak-shadow-hover);
+}
+
+/* 短句卡片 */
+.entry-card--short {
+  /* 可以稍微减少 padding */
+}
+
+.entry-card--short .entry-content {
+  color: var(--content-color-short);
+  line-height: var(--line-height-short);
+}
+
+/* 长文卡片 */
+.entry-card--long {
+  /* 长文可以增加底部间距 */
+}
+
+.timeline-row--entry:has(.entry-card--long) {
+  margin-bottom: 16px;
+}
+
+.timeline-row--entry:has(.entry-card--short) {
+  margin-bottom: 10px;
+}
+
+/* 记录时间戳 */
+.entry-card .entry-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.entry-card .entry-time {
+  font-size: var(--font-size-time);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-align: right;
+  padding-top: 2px;
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+  transition: opacity var(--transition-slow);
+}
+
+.entry-card:hover .entry-time {
+  opacity: var(--time-opacity-hover) !important;
+}
+
+/* 记录天气 */
+.entry-card .entry-weather {
+  font-size: 10px;
+  opacity: 0.35;
+  padding-top: 3px;
+  transition: opacity var(--transition-fast);
+  color: var(--color-text-tertiary);
+  font-weight: 400;
+}
+
+.entry-card:hover .entry-weather {
+  opacity: 0.7;
+}
+
+/* 记录正文 */
+.entry-card .entry-content {
+  flex: 1;
+  margin-left: 16px;
+  font-size: var(--font-size-content);
+  line-height: var(--line-height-normal);
+  color: var(--content-color-normal);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* ----------------------------------------
+   Ghost Day Marker - 幽灵日期标记
+   跳转到无记录日期时显示
+   ---------------------------------------- */
+.timeline-row--ghost {
+  opacity: 0.5;
+}
+
+.timeline-dot--ghost {
+  border: 1px dashed var(--color-text-tertiary);
+  background: transparent !important;
+  opacity: 0.4;
+}
+
+.marker-ghost-hint {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  opacity: 0.5;
+  margin-left: 8px;
+  font-style: italic;
+}
+
+/* ----------------------------------------
+   Continue Writing - 继续书写
+   ---------------------------------------- */
+.timeline-row--continue {
+  margin-top: 24px;
+  margin-bottom: 40px;
+  padding: 8px 0;
+}
+
+.timeline-dot--continue {
+  width: 6px;
+  height: 6px;
+  background: transparent;
+  border: 1.5px dashed var(--color-text-tertiary);
+  opacity: 0.3;
+  top: 10px;
+}
+
+.continue-writing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-normal),
+    opacity var(--transition-normal);
+  opacity: 0.4;
+}
+
+.continue-writing:hover {
+  background-color: var(--glass-weak-bg-hover);
+  opacity: 0.7;
+}
+
+.continue-writing-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-tertiary);
+  opacity: 0.6;
+}
+
+.continue-writing-text {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.5px;
+}
+
+/* ----------------------------------------
+   Highlight Animation - 跳转高亮
+   ---------------------------------------- */
+.timeline-row--highlight {
+  animation: timeline-highlight 2s ease-out;
+}
+
+@keyframes timeline-highlight {
+  0% {
+    background-color: rgba(99, 102, 241, 0.15);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Active 高亮（联动悬停）*/
+.timeline-row--active {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+}
+
+:root:not([data-theme="dark"]) .timeline-row--active {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* ----------------------------------------
+   响应式调整
+   ---------------------------------------- */
+@media (max-width: 767px) {
+  :root {
+    --spine-left: 24px;
+    --content-left: 40px;
+  }
+
+  .timeline-row--year {
+    margin-top: 40px;
+  }
+
+  .timeline-row--month {
+    margin-top: 24px;
+  }
+
+  .entry-card {
+    padding: 10px 12px;
+  }
+
+  .entry-card .entry-meta {
+    width: 42px;
+  }
+
+  .entry-card .entry-content {
+    margin-left: 12px;
+  }
+}
+
+/* ----------------------------------------
+   浅色模式适配
+   ---------------------------------------- */
+:root:not([data-theme="dark"]) .timeline-dot--year {
+  border-color: var(--color-text-secondary);
+  opacity: 0.3;
+}
+
+:root:not([data-theme="dark"]) .timeline-dot--month {
+  background: var(--color-text-secondary);
+  opacity: 0.25;
+}
+
+:root:not([data-theme="dark"]) .timeline-dot--day {
+  background: var(--color-text-secondary);
+  opacity: 0.3;
+}
+
+:root:not([data-theme="dark"]) .timeline-dot--entry {
+  opacity: 0.2;
+}
+
+:root:not([data-theme="dark"]) .marker-year {
+  opacity: 0.5;
+}
+
+:root:not([data-theme="dark"]) .marker-month {
+  opacity: 0.6;
+}
+
+:root:not([data-theme="dark"]) .marker-day {
+  opacity: 0.7;
+}

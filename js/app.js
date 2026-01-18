@@ -722,16 +722,7 @@ const DiaryApp = (function() {
     const found = DiaryUI.scrollToDate(dateKey);
 
     if (!found) {
-      // 无记录：插入 ghost marker 并滚动
-      const ghostEl = DiaryUI.insertGhostDayMarker(dateKey);
-      if (ghostEl) {
-        setTimeout(() => {
-          ghostEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          ghostEl.classList.add('timeline-row--highlight');
-          setTimeout(() => ghostEl.classList.remove('timeline-row--highlight'), 2000);
-        }, 50);
-      }
-      // 激活写作入口
+      // 无记录：激活写作入口，让用户为该日期写日记
       activateWritingEntryWithDate(dateKey);
     }
   }
